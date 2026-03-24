@@ -1,6 +1,12 @@
 import TripCard from '@/components/TripCard';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput } from 'react-native';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+} from 'react-native';
 
 interface Trip {
   id: string;
@@ -17,6 +23,7 @@ export default function HomeScreen() {
   const [rating, setRating] = useState('');
   const [trips, setTrips] = useState<Trip[]>([]);
 
+  // ADD
   const handleAddTrip = () => {
     if (!title.trim() || !destination.trim()) return;
 
@@ -34,6 +41,11 @@ export default function HomeScreen() {
     setDest('');
     setDate('');
     setRating('');
+  };
+
+  // DELETE
+  const handleDelete = (id: string) => {
+    setTrips(trips.filter((trip) => trip.id !== id));
   };
 
   return (
@@ -80,6 +92,7 @@ export default function HomeScreen() {
           destination={trip.destination}
           date={trip.date}
           rating={trip.rating}
+          onDelete={() => handleDelete(trip.id)}
         />
       ))}
     </ScrollView>
@@ -88,7 +101,12 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: '#F0F4F8' },
-  heading: { fontSize: 28, fontWeight: 'bold', marginBottom: 16, marginTop: 48 },
+  heading: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    marginTop: 48,
+  },
   input: {
     borderWidth: 1,
     borderColor: '#CED4DA',
@@ -106,5 +124,9 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 16,
   },
-  addText: { fontSize: 16, fontWeight: 'bold', color: '#0A1628' },
+  addText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#0A1628',
+  },
 });
