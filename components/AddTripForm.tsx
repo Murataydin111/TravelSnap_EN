@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+<<<<<<< HEAD
 import {
   Alert,
   Image,
@@ -15,6 +16,10 @@ import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Colors } from '../constants/Colors';
+=======
+import { Colors } from '@/constants/Colors';
+import type { TripData } from '@/types/trip';
+>>>>>>> 34c53ae (refactor: migrate AddTripForm to dark theme)
 
 interface AddTripFormProps {
   // REVIEW: This callback currently uses 5 positional arguments.
@@ -201,16 +206,25 @@ export default function AddTripForm({
           Colors.textSecondary
         }
         style={styles.input}
+<<<<<<< HEAD
+=======
+        placeholder="Title"
+        placeholderTextColor={Colors.textSecondary}
+>>>>>>> 34c53ae (refactor: migrate AddTripForm to dark theme)
         value={title}
         onChangeText={setTitle}
       />
 
       <TextInput
         placeholder="Destination"
+<<<<<<< HEAD
         placeholderTextColor={
           Colors.textSecondary
         }
         style={styles.input}
+=======
+        placeholderTextColor={Colors.textSecondary}
+>>>>>>> 34c53ae (refactor: migrate AddTripForm to dark theme)
         value={destination}
         onChangeText={setDestination}
       />
@@ -221,6 +235,11 @@ export default function AddTripForm({
           Colors.textSecondary
         }
         style={styles.input}
+<<<<<<< HEAD
+=======
+        placeholder="Date (YYYY-MM)"
+        placeholderTextColor={Colors.textSecondary}
+>>>>>>> 34c53ae (refactor: migrate AddTripForm to dark theme)
         value={date}
         onChangeText={setDate}
       />
@@ -231,7 +250,12 @@ export default function AddTripForm({
           Colors.textSecondary
         }
         style={styles.input}
+<<<<<<< HEAD
         keyboardType="numeric"
+=======
+        placeholder="Rating (1-5)"
+        placeholderTextColor={Colors.textSecondary}
+>>>>>>> 34c53ae (refactor: migrate AddTripForm to dark theme)
         value={rating}
         onChangeText={setRating}
       />
@@ -290,9 +314,14 @@ export default function AddTripForm({
 }
 
 const styles = StyleSheet.create({
+<<<<<<< HEAD
   container: {
     backgroundColor: Colors.card,
 
+=======
+  form: {
+    backgroundColor: Colors.card,
+>>>>>>> 34c53ae (refactor: migrate AddTripForm to dark theme)
     padding: 16,
 
     borderRadius: 16,
@@ -308,10 +337,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
 
     marginBottom: 16,
+<<<<<<< HEAD
+=======
+    color: Colors.textPrimary,
+>>>>>>> 34c53ae (refactor: migrate AddTripForm to dark theme)
   },
 
   input: {
     backgroundColor: Colors.inputBg,
+<<<<<<< HEAD
 
     borderWidth: 1,
 
@@ -337,6 +371,20 @@ const styles = StyleSheet.create({
 
     padding: 24,
 
+=======
+    borderWidth: 1,
+    borderColor: Colors.inputBorder,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+    fontSize: 16,
+    color: Colors.textPrimary,
+  },
+  addButton: {
+    backgroundColor: Colors.accent,
+    padding: 16,
+    borderRadius: 12,
+>>>>>>> 34c53ae (refactor: migrate AddTripForm to dark theme)
     alignItems: 'center',
 
     marginBottom: 16,
@@ -347,6 +395,7 @@ const styles = StyleSheet.create({
 
     marginTop: 8,
   },
+<<<<<<< HEAD
 
   preview: {
     width: '100%',
@@ -356,6 +405,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
 
     marginBottom: 12,
+=======
+  addButtonText: {
+    color: Colors.textPrimary,
+    fontWeight: 'bold',
+    fontSize: 16,
+>>>>>>> 34c53ae (refactor: migrate AddTripForm to dark theme)
   },
 
   photoButton: {
