@@ -1,9 +1,9 @@
 import {
-    Image,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -46,11 +46,6 @@ export default function TripCard({
         {onDelete && (
           <Pressable
             style={styles.deleteButton}
-            // REVIEW: This handler does not stop event propagation.
-            // Why it is a bug: when TripCard is wrapped in parent Pressable/Link,
-            // tapping delete can also trigger navigation.
-            // How to fix: use a local handler with GestureResponderEvent and call
-            // `event.stopPropagation()` before `onDelete?.()`.
             onPress={onDelete}
           >
             <Ionicons
@@ -76,55 +71,38 @@ export default function TripCard({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.card,
-
     borderRadius: 16,
-
     padding: 16,
-
     marginBottom: 12,
-
     shadowColor: '#000',
-
     shadowOpacity: 0.2,
-
     shadowRadius: 8,
-
     elevation: 4,
   },
 
   cardImage: {
     width: '100%',
-
     height: 180,
-
     borderTopLeftRadius: 12,
-
     borderTopRightRadius: 12,
-
     marginBottom: 12,
   },
 
   topRow: {
     flexDirection: 'row',
-
     justifyContent: 'space-between',
-
     alignItems: 'center',
   },
 
   title: {
     color: Colors.textPrimary,
-
     fontSize: 18,
-
     fontWeight: 'bold',
   },
 
   meta: {
     color: Colors.textSecondary,
-
     fontSize: 13,
-
     marginTop: 4,
   },
 
@@ -133,11 +111,8 @@ const styles = StyleSheet.create({
   },
 
   deleteButton: {
-    backgroundColor:
-      'rgba(233,69,96,0.15)',
-
+    backgroundColor: 'rgba(233,69,96,0.15)',
     borderRadius: 12,
-
     padding: 6,
   },
 });

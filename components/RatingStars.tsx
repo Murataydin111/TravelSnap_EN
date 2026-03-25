@@ -1,6 +1,5 @@
-import { StyleSheet, View } from 'react-native';
-
 import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet, View } from 'react-native';
 
 import { Colors } from '../constants/Colors';
 
@@ -32,7 +31,6 @@ export default function RatingStars({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-
     gap: 4,
   },
 });
