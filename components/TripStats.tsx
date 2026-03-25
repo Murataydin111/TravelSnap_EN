@@ -1,48 +1,26 @@
-// REVIEW: React default import is unused here with modern JSX transform.
-// How to fix: remove it if linter reports unused import.
-import React from 'react';
-
-import {
-    StyleSheet,
-    Text,
-    View,
-} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Colors } from '../constants/Colors';
-
-// REVIEW: Local Trip type duplicates shared domain model.
-// Why it is risky: this can drift from `types/trip.ts` and create type mismatch.
-// How to fix: import `Trip` from `../types/trip` and reuse one source of truth.
-interface Trip {
-  id: string;
-  title: string;
-  destination: string;
-  date: string;
-  rating: number;
-}
+import type { Trip } from '../types/trip';
 
 interface TripStatsProps {
   trips: Trip[];
 }
 
-export default function TripStats({
-  trips,
-}: TripStatsProps) {
-  // REVIEW: Same stats logic is also calculated in profile screen.
-  // Why it matters: duplicated business logic is harder to keep consistent.
-  // How to fix: extract to shared utility or `useTripStats` hook.
+export default function TripStats({ trips }: TripStatsProps) {
+  const count = trips.length;
+
+  const totalRating = trips.reduce(
+    (sum, trip) => sum + trip.rating,
+    0
+  );
+
   const avgRating =
-    trips.length > 0
-      ? (
-          trips.reduce(
-            (sum, trip) =>
-              sum + trip.rating,
-            0
-          ) / trips.length
-        ).toFixed(1)
+    count > 0
+      ? (totalRating / count).toFixed(1)
       : '0.0';
 
-  const countries =
+  const uniqueDestinations =
     new Set(
       trips.map(
         (trip) => trip.destination
@@ -51,32 +29,29 @@ export default function TripStats({
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.value}>
-          {trips.length}
+      <View style={styles.statCard}>
+        <Text style={styles.statValue}>
+          {count}
         </Text>
-
-        <Text style={styles.label}>
+        <Text style={styles.statLabel}>
           Trips
         </Text>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.value}>
+      <View style={styles.statCard}>
+        <Text style={styles.statValue}>
           {avgRating}
         </Text>
-
-        <Text style={styles.label}>
+        <Text style={styles.statLabel}>
           Avg Rating
         </Text>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.value}>
-          {countries}
+      <View style={styles.statCard}>
+        <Text style={styles.statValue}>
+          {uniqueDestinations}
         </Text>
-
-        <Text style={styles.label}>
+        <Text style={styles.statLabel}>
           Countries
         </Text>
       </View>
@@ -87,37 +62,28 @@ export default function TripStats({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-
     gap: 8,
-
     marginBottom: 16,
   },
 
-  card: {
+  statCard: {
     flex: 1,
-
     backgroundColor: Colors.card,
-
     padding: 12,
-
     borderRadius: 12,
-
     alignItems: 'center',
+    justifyContent: 'center',
   },
 
-  value: {
-    color: Colors.primary,
-
-    fontSize: 22,
-
+  statValue: {
+    fontSize: 24,
     fontWeight: 'bold',
+    color: Colors.primary,
   },
 
-  label: {
-    color: Colors.textSecondary,
-
+  statLabel: {
     fontSize: 12,
-
+    color: Colors.textSecondary,
     marginTop: 4,
   },
 });
