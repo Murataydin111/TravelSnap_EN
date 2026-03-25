@@ -1,7 +1,7 @@
 import {
-    StyleSheet,
-    Text,
-    View,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 
 import { Colors } from '../constants/Colors';
@@ -37,49 +37,35 @@ export default function ScreenHeader({
 const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
-
     justifyContent: 'space-between',
-
     alignItems: 'center',
-
     paddingTop: 20,
-
     paddingHorizontal: 16,
-
     paddingBottom: 12,
   },
 
   appName: {
     color: Colors.textPrimary,
-
     fontSize: 28,
-
     fontWeight: 'bold',
   },
 
   subtitle: {
     color: Colors.textSecondary,
-
     marginTop: 4,
   },
 
   badge: {
     width: 36,
-
     height: 36,
-
     borderRadius: 18,
-
     backgroundColor: Colors.accent,
-
     justifyContent: 'center',
-
     alignItems: 'center',
   },
 
   badgeText: {
     color: Colors.textPrimary,
-
     fontWeight: 'bold',
   },
 });
