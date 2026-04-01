@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   Image,
   Pressable,
@@ -5,6 +6,11 @@ import {
   Text,
   View,
 } from 'react-native';
+=======
+import { StyleSheet, Text, View, Pressable } from 'react-native';
+import type { GestureResponderEvent } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+>>>>>>> 5108797 (fix: prevent navigation when deleting trip card)
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -21,6 +27,7 @@ interface TripCardProps {
   onDelete?: () => void;
 }
 
+<<<<<<< HEAD
 export default function TripCard({
   title,
   destination,
@@ -29,6 +36,15 @@ export default function TripCard({
   imageUri,
   onDelete,
 }: TripCardProps) {
+=======
+export default function TripCard({ title, destination, date, rating, onDelete }: TripCardProps) {
+  const handleDeletePress = (event: GestureResponderEvent): void => {
+    // Prevent parent card press (Link navigation) when deleting.
+    event.stopPropagation();
+    onDelete?.();
+  };
+
+>>>>>>> 5108797 (fix: prevent navigation when deleting trip card)
   return (
     <View style={styles.card}>
       {imageUri && (
@@ -44,6 +60,7 @@ export default function TripCard({
         </Text>
 
         {onDelete && (
+<<<<<<< HEAD
           <Pressable
             style={styles.deleteButton}
             onPress={onDelete}
@@ -53,6 +70,10 @@ export default function TripCard({
               size={18}
               color={Colors.accent}
             />
+=======
+          <Pressable onPress={handleDeletePress} style={styles.deleteButton}>
+            <Ionicons name="close" size={16} color={Colors.accent} />
+>>>>>>> 5108797 (fix: prevent navigation when deleting trip card)
           </Pressable>
         )}
       </View>
