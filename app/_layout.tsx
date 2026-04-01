@@ -1,8 +1,9 @@
 import { Stack } from 'expo-router';
-
-import { TripProvider } from '../context/TripContext';
+import { StatusBar } from 'expo-status-bar';
 
 import { Colors } from '../constants/Colors';
+import { TripProvider } from '../context/TripContext';
+
 const darkHeaderOptions = {
   headerStyle: { backgroundColor: Colors.background },
   headerTintColor: Colors.primary,
@@ -11,39 +12,30 @@ const darkHeaderOptions = {
 export default function RootLayout() {
   return (
     <TripProvider>
-
-      <Stack
-        screenOptions={{
-          headerStyle: {
-            backgroundColor:
-              Colors.background,
-          },
-
-          headerTintColor:
-            Colors.primary,
-
-          contentStyle: {
-            backgroundColor:
-              Colors.background,
-          },
-        }}
-      >
+      <Stack screenOptions={darkHeaderOptions}>
         <Stack.Screen
           name="(tabs)"
-          options={{
-            headerShown: false,
-          }}
+          options={{ headerShown: false }}
         />
 
         <Stack.Screen
           name="trip/[id]"
           options={{
             title: 'Trip Details',
-            animation:
-              'slide_from_right',
+            animation: 'slide_from_right',
+          }}
+        />
+
+        <Stack.Screen
+          name="add-trip"
+          options={{
+            title: 'Add Trip',
+            presentation: 'modal',
           }}
         />
       </Stack>
+
+      <StatusBar style="light" />
     </TripProvider>
   );
 }

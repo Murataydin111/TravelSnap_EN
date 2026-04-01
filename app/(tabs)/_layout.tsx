@@ -1,19 +1,17 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 
-import { Ionicons } from '@expo/vector-icons';
-
 import { Colors } from '../../constants/Colors';
+
+const TAB_ICON_SIZE = 24;
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-
         tabBarActiveTintColor: Colors.primary,
-
         tabBarInactiveTintColor: '#8B95A5',
-
         tabBarStyle: {
           backgroundColor: Colors.background,
           borderTopWidth: 0,
@@ -26,11 +24,10 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <Ionicons
               name="home"
-              size={size}
+              size={TAB_ICON_SIZE}
               color={color}
             />
           ),
@@ -41,11 +38,10 @@ export default function TabLayout() {
         name="explore"
         options={{
           title: 'Explore',
-
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <Ionicons
               name="compass-outline"
-              size={size}
+              size={TAB_ICON_SIZE}
               color={color}
             />
           ),
@@ -56,11 +52,10 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profile',
-
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <Ionicons
               name="person"
-              size={size}
+              size={TAB_ICON_SIZE}
               color={color}
             />
           ),
