@@ -1,39 +1,23 @@
 import { useState } from 'react';
-
-import {
-  Alert,
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
-
-import * as ImagePicker from 'expo-image-picker';
-
+import { Alert, Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Colors } from '../constants/Colors';
+import { Colors } from '@/constants/Colors';
+import { useImagePicker } from '@/hooks/useImagePicker';
+import type { TripData } from '@/types/trip';
 
 interface AddTripFormProps {
-  // REVIEW: This callback currently uses 5 positional arguments.
-  // Why it is risky: argument order mistakes are easy and adding new fields
-  // requires refactoring every call site.
-  // How to fix: prefer `onAdd: (trip: TripData) => void` and pass one typed object.
-  onAdd: (
-    title: string,
-    destination: string,
-    date: string,
-    rating: number,
-    imageUri?: string
-  ) => void;
+  onAdd: (trip: TripData, id: string) => void;
 }
 
-const dateRegex =
-  /^\d{4}-\d{2}-\d{2}$/;
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
-const validate = (title: string, destination: string, date: string, rating: string): string | null => {
+const validate = (
+  title: string,
+  destination: string,
+  date: string,
+  rating: string
+): string | null => {
   if (!title.trim() || !destination.trim() || !date.trim() || !rating.trim())
     return 'All fields are required!';
   if (!DATE_REGEX.test(date))
@@ -45,153 +29,36 @@ const validate = (title: string, destination: string, date: string, rating: stri
 };
 
 export default function AddTripForm({ onAdd }: AddTripFormProps) {
+  const [tripId] = useState(() => Date.now().toString());
   const [title, setTitle] = useState('');
-  const [destination, setDestination] =
-    useState('');
+  const [destination, setDestination] = useState('');
   const [date, setDate] = useState('');
   const [rating, setRating] = useState('');
   const [imageUri, setImageUri] = useState<string | undefined>();
 
+  const { handleAddPhoto } = useImagePicker({
+    tripId,
+    onSaved: setImageUri,
+    aspect: [16, 9],
+  });
 
-
-  const pickImage = async () => {
-    const result =
-      await ImagePicker.launchImageLibraryAsync(
-        {
-          mediaTypes:
-            ImagePicker.MediaTypeOptions.Images,
-
-          allowsEditing: true,
-
-          aspect: [16, 9],
-
-          quality: 0.8,
-        }
-      );
-
-    if (!result.canceled) {
-      // REVIEW: Picker URI can be temporary and may stop working after restart.
-      // How to fix: persist the file (for example with saveImageToTrip) and store
-      // the persistent URI in state instead of raw picker URI.
-      setImageUri(
-        result.assets[0].uri
-      );
-    }
-  };
-
-  const takePhoto = async () => {
-    const permission =
-      await ImagePicker.requestCameraPermissionsAsync();
-
-    if (
-      permission.status !==
-      'granted'
-    ) {
-      Alert.alert(
-        'Permission required'
-      );
-
+  const handleSubmit = (): void => {
+    const error = validate(title, destination, date, rating);
+    if (error) {
+      Alert.alert('Error', error);
       return;
     }
 
-    const result =
-      await ImagePicker.launchCameraAsync(
-        {
-          allowsEditing: true,
-
-          aspect: [16, 9],
-
-          quality: 0.8,
-        }
-      );
-
-    if (!result.canceled) {
-      setImageUri(
-        result.assets[0].uri
-      );
-    }
-  };
-
-  const handleAddPhoto = () => {
-    Alert.alert(
-      'Add Photo',
-      'Choose an option',
-      [
-        {
-          text: 'Gallery',
-          onPress: pickImage,
-        },
-        {
-          text: 'Camera',
-          onPress: takePhoto,
-        },
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-      ]
-    );
-  };
-
-  const handleSubmit = () => {
-    // REVIEW: This check does not trim text values.
-    // Why it is a bug: strings like "   " are truthy, so empty-looking input
-    // can pass validation.
-    // How to fix: validate `!title.trim()` etc. and pass trimmed values to `onAdd`.
-    if (
-      !title ||
-      !destination ||
-      !date ||
-      !rating
-    ) {
-      Alert.alert(
-        'Error',
-        'Please fill all fields'
-      );
-
-      return;
-    }
-
-    const numericRating =
-      Number(rating);
-
-    // REVIEW: Missing NaN guard.
-    // Why it is a bug: Number("abc") => NaN, and both comparisons below are false,
-    // so invalid non-numeric input can pass.
-    // How to fix: include `isNaN(numericRating)` in this condition.
-    if (
-      numericRating < 1 ||
-      numericRating > 5
-    ) {
-      Alert.alert(
-        'Error',
-        'Rating must be between 1 and 5'
-      );
-
-      return;
-    }
-
-    const dateRegex =
-      /^\d{4}-\d{2}$/;
-
-    if (!dateRegex.test(date)) {
-      Alert.alert(
-        'Error',
-        'Date must be YYYY-MM'
-      );
-
-      return;
-    }
-
-    // REVIEW: Values are forwarded without trim().
-    // Why it is risky: whitespace-only input may be persisted as real data.
-    // How to fix: pass `title.trim()`, `destination.trim()`, `date.trim()`.
     onAdd(
-      title,
-      destination,
-      date,
-      numericRating,
-      imageUri
+      {
+        title: title.trim(),
+        destination: destination.trim(),
+        date: date.trim(),
+        rating: Number(rating),
+        imageUri,
+        galleryUris: imageUri ? [imageUri] : [],
+      },
+      tripId
     );
 
     setTitle('');
@@ -202,201 +69,132 @@ export default function AddTripForm({ onAdd }: AddTripFormProps) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        Add New Trip
-      </Text>
+    <View style={styles.form}>
+      <Text style={styles.formTitle}>Add new trip</Text>
 
       <TextInput
-        placeholder="Trip title"
-        placeholderTextColor={
-          Colors.textSecondary
-        }
         style={styles.input}
+        placeholder="Title"
+        placeholderTextColor={Colors.textSecondary}
         value={title}
         onChangeText={setTitle}
       />
-
       <TextInput
-        placeholder="Destination"
-        placeholderTextColor={
-          Colors.textSecondary
-        }
         style={styles.input}
+        placeholder="Destination"
+        placeholderTextColor={Colors.textSecondary}
         value={destination}
         onChangeText={setDestination}
       />
-
       <TextInput
-        'Date must be YYYY-MM-DD'
-        placeholderTextColor={
-          Colors.textSecondary
-        }
         style={styles.input}
+        placeholder="Date (YYYY-MM-DD)"
+        placeholderTextColor={Colors.textSecondary}
         value={date}
         onChangeText={setDate}
       />
-
       <TextInput
-        placeholder="Rating 1-5"
-        placeholderTextColor={
-          Colors.textSecondary
-        }
         style={styles.input}
-        keyboardType="numeric"
+        placeholder="Rating (1-5)"
+        placeholderTextColor={Colors.textSecondary}
         value={rating}
         onChangeText={setRating}
+        keyboardType="numeric"
       />
 
       {imageUri ? (
-        <>
-          <Image
-            source={{ uri: imageUri }}
-            style={styles.preview}
-          />
-
-          <Pressable
-            style={styles.photoButton}
-            onPress={handleAddPhoto}
-          >
-            <Text
-              style={
-                styles.photoButtonText
-              }
-            >
-              Change photo
-            </Text>
+        <View style={styles.previewContainer}>
+          <Image source={{ uri: imageUri }} style={styles.preview} />
+          <Pressable style={styles.changePhotoButton} onPress={handleAddPhoto}>
+            <Text style={styles.changePhotoText}>Change photo</Text>
           </Pressable>
-        </>
+        </View>
       ) : (
-        <Pressable
-          style={styles.photoPicker}
-          onPress={handleAddPhoto}
-        >
-          <Ionicons
-            name="camera-outline"
-            size={32}
-            color={Colors.primary}
-          />
-
-          <Text
-            style={
-              styles.photoPickerText
-            }
-          >
-            Add a photo
-          </Text>
+        <Pressable style={styles.photoPlaceholder} onPress={handleAddPhoto}>
+          <Ionicons name="camera-outline" size={32} color={Colors.textSecondary} />
+          <Text style={styles.photoPlaceholderText}>Add a photo</Text>
         </Pressable>
       )}
 
-      <Pressable
-        style={styles.button}
-        onPress={handleSubmit}
-      >
-        <Text style={styles.buttonText}>
-          Add Trip
-        </Text>
+      <Pressable style={styles.addButton} onPress={handleSubmit}>
+        <Text style={styles.addButtonText}>Add Trip</Text>
       </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  form: {
     backgroundColor: Colors.card,
-
     padding: 16,
-
     borderRadius: 16,
-
-    marginBottom: 20,
+    marginBottom: 24,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-
-  title: {
-    color: Colors.textPrimary,
-
-    fontSize: 20,
-
+  formTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-
     marginBottom: 16,
+    color: Colors.textPrimary,
   },
-
   input: {
     backgroundColor: Colors.inputBg,
-
     borderWidth: 1,
-
     borderColor: Colors.inputBorder,
-
-    borderRadius: 12,
-
-    padding: 14,
-
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+    fontSize: 16,
     color: Colors.textPrimary,
-
+  },
+  photoPlaceholder: {
+    borderWidth: 1.5,
+    borderColor: Colors.inputBorder,
+    borderStyle: 'dashed',
+    borderRadius: 8,
+    height: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
     marginBottom: 12,
   },
-
-  photoPicker: {
-    borderWidth: 2,
-
-    borderStyle: 'dashed',
-
-    borderColor: Colors.primary,
-
-    borderRadius: 12,
-
-    padding: 24,
-
-    alignItems: 'center',
-
-    marginBottom: 16,
-  },
-
-  photoPickerText: {
+  photoPlaceholderText: {
     color: Colors.textSecondary,
-
-    marginTop: 8,
+    fontSize: 14,
   },
-
+  previewContainer: {
+    marginBottom: 12,
+    gap: 8,
+  },
   preview: {
     width: '100%',
-
     height: 200,
-
-    borderRadius: 12,
-
-    marginBottom: 12,
+    borderRadius: 8,
   },
-
-  photoButton: {
-    marginBottom: 16,
-
+  changePhotoButton: {
     alignItems: 'center',
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: Colors.inputBg,
   },
-
-  photoButtonText: {
+  changePhotoText: {
     color: Colors.primary,
-
-    fontWeight: 'bold',
+    fontSize: 14,
+    fontWeight: '600',
   },
-
-  button: {
+  addButton: {
     backgroundColor: Colors.accent,
-
-    padding: 14,
-
+    padding: 16,
     borderRadius: 12,
-
     alignItems: 'center',
+    marginTop: 8,
   },
-
-  buttonText: {
+  addButtonText: {
     color: Colors.textPrimary,
-
-    fontSize: 16,
-
     fontWeight: 'bold',
+    fontSize: 16,
   },
 });
