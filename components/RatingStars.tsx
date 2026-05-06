@@ -1,38 +1,36 @@
-import { Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet, View } from 'react-native';
+import { Colors } from '../constants/Colors';
 
 interface RatingStarsProps {
   rating: number;
-  maxStars?: number;
 }
 
 export default function RatingStars({
   rating,
-  maxStars = 5,
 }: RatingStarsProps) {
-  const stars = [];
-
-  for (let i = 1; i <= maxStars; i++) {
-    stars.push(
-      <Text
-        key={i}
-        style={{
-          fontSize: 18,
-          color: '#FFD700',
-        }}
-      >
-        {i <= rating ? '★' : '☆'}
-      </Text>
-    );
-  }
-
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        marginTop: 8,
-      }}
-    >
-      {stars}
+    <View style={styles.container}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Ionicons
+          key={star}
+          name={
+            star <= rating
+              ? 'star'
+              : 'star-outline'
+          }
+          size={16}
+          color={Colors.accent}
+        />
+      ))}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    marginTop: 10,
+    gap: 4,
+  },
+});

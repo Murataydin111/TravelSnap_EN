@@ -1,13 +1,19 @@
 import { useState } from 'react';
+
 import {
-  Pressable,
+  SafeAreaView,
   ScrollView,
+  StatusBar,
   StyleSheet,
-  Text,
-  TextInput,
 } from 'react-native';
 
+import AddTripForm from '../../components/AddTripForm';
+import EmptyState from '../../components/EmptyState';
+import ScreenHeader from '../../components/ScreenHeader';
 import TripCard from '../../components/TripCard';
+import TripStats from '../../components/TripStats';
+
+import { Colors } from '../../constants/Colors';
 
 interface Trip {
   id: string;
@@ -18,148 +24,104 @@ interface Trip {
 }
 
 export default function HomeScreen() {
-  const [title, setTitle] = useState('');
-  const [destination, setDestination] = useState('');
-  const [date, setDate] = useState('');
-  const [rating, setRating] = useState('');
+  const [trips, setTrips] = useState<Trip[]>(
+    []
+  );
 
-  const [trips, setTrips] = useState<Trip[]>([]);
-
-  const handleAddTrip = () => {
-    if (
-      !title.trim() ||
-      !destination.trim() ||
-      !date.trim() ||
-      !rating.trim()
-    ) {
-      return;
-    }
-
-    const ratingNumber = Number(rating);
-
-    if (ratingNumber < 1 || ratingNumber > 5) {
-      return;
-    }
-
-    const dateRegex = /^\d{4}-\d{2}$/;
-
-    if (!dateRegex.test(date)) {
-      return;
-    }
-
+  const handleAddTrip = (
+    title: string,
+    destination: string,
+    date: string,
+    rating: number
+  ) => {
     const newTrip: Trip = {
       id: Date.now().toString(),
       title,
       destination,
       date,
-      rating: ratingNumber,
+      rating,
     };
 
     setTrips([...trips, newTrip]);
-
-    setTitle('');
-    setDestination('');
-    setDate('');
-    setRating('');
   };
 
-  const handleDelete = (id: string) => {
-    setTrips(trips.filter((trip) => trip.id !== id));
+  const handleDeleteTrip = (id: string) => {
+    setTrips(
+      trips.filter((trip) => trip.id !== id)
+    );
   };
+
+  const averageRating =
+    trips.length > 0
+      ? trips.reduce(
+          (sum, trip) => sum + trip.rating,
+          0
+        ) / trips.length
+      : 0;
+
+  const countries = new Set(
+    trips.map((trip) => trip.destination)
+  ).size;
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.heading}>TravelSnap</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="light-content" />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Trip title"
-        value={title}
-        onChangeText={setTitle}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Destination"
-        value={destination}
-        onChangeText={setDestination}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Date YYYY-MM"
-        value={date}
-        onChangeText={setDate}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Rating 1-5"
-        value={rating}
-        onChangeText={setRating}
-        keyboardType="numeric"
-      />
-
-      <Pressable style={styles.button} onPress={handleAddTrip}>
-        <Text style={styles.buttonText}>Add Trip</Text>
-      </Pressable>
-
-      <Text style={styles.tripCount}>
-        Total Trips: {trips.length}
-      </Text>
-
-      {trips.map((trip) => (
-        <TripCard
-          key={trip.id}
-          title={trip.title}
-          destination={trip.destination}
-          date={trip.date}
-          rating={trip.rating}
-          onDelete={() => handleDelete(trip.id)}
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={
+          styles.content
+        }
+      >
+        <ScreenHeader
+          tripCount={trips.length}
         />
-      ))}
-    </ScrollView>
+
+        <TripStats
+          tripCount={trips.length}
+          averageRating={averageRating}
+          countries={countries}
+        />
+
+        <AddTripForm
+          onAdd={handleAddTrip}
+        />
+
+        {trips.length === 0 ? (
+          <EmptyState />
+        ) : (
+          trips.map((trip) => (
+            <TripCard
+              key={trip.id}
+              title={trip.title}
+              destination={
+                trip.destination
+              }
+              date={trip.date}
+              rating={trip.rating}
+              onDelete={() =>
+                handleDeleteTrip(trip.id)
+              }
+            />
+          ))
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#F0F4F8',
+    backgroundColor: Colors.background,
   },
 
-  heading: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginTop: 50,
-    marginBottom: 20,
-  },
-
-  input: {
-    backgroundColor: 'white',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 10,
-    fontSize: 16,
-  },
-
-  button: {
-    backgroundColor: '#61DAFB',
-    padding: 14,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-
-  buttonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-
-  tripCount: {
-    fontSize: 18,
-    marginBottom: 16,
-    fontWeight: '600',
+  content: {
+    padding: 16,
   },
 });
