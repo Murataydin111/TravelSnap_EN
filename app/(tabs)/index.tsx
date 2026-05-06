@@ -1,88 +1,145 @@
+import { useState } from 'react';
+
 import {
-  Alert,
-  Image,
   Pressable,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
   StyleSheet,
-  Text,
-  View,
 } from 'react-native';
 
+import { Link } from 'expo-router';
+
+import AddTripForm from '../../components/AddTripForm';
+import EmptyState from '../../components/EmptyState';
+import ScreenHeader from '../../components/ScreenHeader';
+import TripCard from '../../components/TripCard';
+import TripStats from '../../components/TripStats';
+
+import { Colors } from '../../constants/Colors';
+
+interface Trip {
+  id: string;
+  title: string;
+  destination: string;
+  date: string;
+  rating: number;
+}
+
 export default function HomeScreen() {
+  const [trips, setTrips] = useState<Trip[]>(
+    []
+  );
+
+  const handleAddTrip = (
+    title: string,
+    destination: string,
+    date: string,
+    rating: number
+  ) => {
+    const newTrip: Trip = {
+      id: Date.now().toString(),
+      title,
+      destination,
+      date,
+      rating,
+    };
+
+    setTrips((prevTrips) => [
+      newTrip,
+      ...prevTrips,
+    ]);
+  };
+
+  const handleDeleteTrip = (
+    id: string
+  ) => {
+    setTrips((prevTrips) =>
+      prevTrips.filter(
+        (trip) => trip.id !== id
+      )
+    );
+  };
+
   return (
-    <View style={styles.container}>
-      <Image
-        source={{
-          uri: 'https://picsum.photos/200',
-        }}
-        style={styles.image}
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar
+        barStyle="light-content"
       />
 
-      <Text style={styles.title}>TravelSnap</Text>
-
-      <Text style={styles.subtitle}>
-        Your travel journal
-      </Text>
-
-      <Text style={styles.author}>
-        Murat Aydin
-      </Text>
-
-      <Pressable
-        style={styles.button}
-        onPress={() =>
-          Alert.alert('Welcome to TravelSnap!')
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={
+          styles.contentContainer
         }
       >
-        <Text style={styles.buttonText}>
-          Press Me
-        </Text>
-      </Pressable>
-    </View>
+        <ScreenHeader
+          tripCount={trips.length}
+        />
+
+        <TripStats trips={trips} />
+
+        <AddTripForm
+          onAdd={handleAddTrip}
+        />
+
+        {trips.length === 0 ? (
+          <EmptyState />
+        ) : (
+          trips.map((trip) => (
+            <Link
+              key={trip.id}
+              href={{
+            pathname: '/trip/[id]' as any,
+               params: {
+                  id: trip.id,
+                  title: trip.title,
+                  destination:
+                    trip.destination,
+                  date: trip.date,
+                  rating: String(
+                    trip.rating
+                  ),
+                },
+              }}
+              asChild
+            >
+              <Pressable>
+                <TripCard
+                  {...trip}
+                  onDelete={() =>
+                    handleDeleteTrip(
+                      trip.id
+                    )
+                  }
+                />
+              </Pressable>
+            </Link>
+          ))
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+
+    backgroundColor:
+      Colors.background,
+  },
+
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 20,
+
+    backgroundColor:
+      Colors.background,
   },
 
-  image: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 20,
-  },
+  contentContainer: {
+    padding: 16,
 
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-  },
-
-  subtitle: {
-    fontSize: 18,
-    color: 'gray',
-    marginTop: 10,
-  },
-
-  author: {
-    fontSize: 16,
-    marginTop: 15,
-  },
-
-  button: {
-    marginTop: 30,
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 10,
-  },
-
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    paddingBottom: 40,
   },
 });
