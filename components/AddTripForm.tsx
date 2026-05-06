@@ -2,12 +2,17 @@ import { useState } from 'react';
 
 import {
   Alert,
+  Image,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+
+import * as ImagePicker from 'expo-image-picker';
+
+import { Ionicons } from '@expo/vector-icons';
 
 import { Colors } from '../constants/Colors';
 
@@ -16,7 +21,8 @@ interface AddTripFormProps {
     title: string,
     destination: string,
     date: string,
-    rating: number
+    rating: number,
+    imageUri?: string
   ) => void;
 }
 
@@ -29,6 +35,85 @@ export default function AddTripForm({
   const [date, setDate] = useState('');
   const [rating, setRating] = useState('');
 
+  const [imageUri, setImageUri] =
+    useState<string>();
+
+  const pickImage = async () => {
+    const result =
+      await ImagePicker.launchImageLibraryAsync(
+        {
+          mediaTypes:
+            ImagePicker.MediaTypeOptions.Images,
+
+          allowsEditing: true,
+
+          aspect: [16, 9],
+
+          quality: 0.8,
+        }
+      );
+
+    if (!result.canceled) {
+      setImageUri(
+        result.assets[0].uri
+      );
+    }
+  };
+
+  const takePhoto = async () => {
+    const permission =
+      await ImagePicker.requestCameraPermissionsAsync();
+
+    if (
+      permission.status !==
+      'granted'
+    ) {
+      Alert.alert(
+        'Permission required'
+      );
+
+      return;
+    }
+
+    const result =
+      await ImagePicker.launchCameraAsync(
+        {
+          allowsEditing: true,
+
+          aspect: [16, 9],
+
+          quality: 0.8,
+        }
+      );
+
+    if (!result.canceled) {
+      setImageUri(
+        result.assets[0].uri
+      );
+    }
+  };
+
+  const handleAddPhoto = () => {
+    Alert.alert(
+      'Add Photo',
+      'Choose an option',
+      [
+        {
+          text: 'Gallery',
+          onPress: pickImage,
+        },
+        {
+          text: 'Camera',
+          onPress: takePhoto,
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ]
+    );
+  };
+
   const handleSubmit = () => {
     if (
       !title ||
@@ -40,10 +125,12 @@ export default function AddTripForm({
         'Error',
         'Please fill all fields'
       );
+
       return;
     }
 
-    const numericRating = Number(rating);
+    const numericRating =
+      Number(rating);
 
     if (
       numericRating < 1 ||
@@ -53,16 +140,19 @@ export default function AddTripForm({
         'Error',
         'Rating must be between 1 and 5'
       );
+
       return;
     }
 
-    const dateRegex = /^\d{4}-\d{2}$/;
+    const dateRegex =
+      /^\d{4}-\d{2}$/;
 
     if (!dateRegex.test(date)) {
       Alert.alert(
         'Error',
         'Date must be YYYY-MM'
       );
+
       return;
     }
 
@@ -70,13 +160,15 @@ export default function AddTripForm({
       title,
       destination,
       date,
-      numericRating
+      numericRating,
+      imageUri
     );
 
     setTitle('');
     setDestination('');
     setDate('');
     setRating('');
+    setImageUri(undefined);
   };
 
   return (
@@ -126,6 +218,47 @@ export default function AddTripForm({
         onChangeText={setRating}
       />
 
+      {imageUri ? (
+        <>
+          <Image
+            source={{ uri: imageUri }}
+            style={styles.preview}
+          />
+
+          <Pressable
+            style={styles.photoButton}
+            onPress={handleAddPhoto}
+          >
+            <Text
+              style={
+                styles.photoButtonText
+              }
+            >
+              Change photo
+            </Text>
+          </Pressable>
+        </>
+      ) : (
+        <Pressable
+          style={styles.photoPicker}
+          onPress={handleAddPhoto}
+        >
+          <Ionicons
+            name="camera-outline"
+            size={32}
+            color={Colors.primary}
+          />
+
+          <Text
+            style={
+              styles.photoPickerText
+            }
+          >
+            Add a photo
+          </Text>
+        </Pressable>
+      )}
+
       <Pressable
         style={styles.button}
         onPress={handleSubmit}
@@ -173,6 +306,50 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
 
     marginBottom: 12,
+  },
+
+  photoPicker: {
+    borderWidth: 2,
+
+    borderStyle: 'dashed',
+
+    borderColor: Colors.primary,
+
+    borderRadius: 12,
+
+    padding: 24,
+
+    alignItems: 'center',
+
+    marginBottom: 16,
+  },
+
+  photoPickerText: {
+    color: Colors.textSecondary,
+
+    marginTop: 8,
+  },
+
+  preview: {
+    width: '100%',
+
+    height: 200,
+
+    borderRadius: 12,
+
+    marginBottom: 12,
+  },
+
+  photoButton: {
+    marginBottom: 16,
+
+    alignItems: 'center',
+  },
+
+  photoButtonText: {
+    color: Colors.primary,
+
+    fontWeight: 'bold',
   },
 
   button: {

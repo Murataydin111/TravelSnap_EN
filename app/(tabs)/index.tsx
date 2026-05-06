@@ -24,18 +24,20 @@ interface Trip {
   destination: string;
   date: string;
   rating: number;
+  imageUri?: string;
 }
 
 export default function HomeScreen() {
-  const [trips, setTrips] = useState<Trip[]>(
-    []
-  );
+  const [trips, setTrips] = useState<
+    Trip[]
+  >([]);
 
   const handleAddTrip = (
     title: string,
     destination: string,
     date: string,
-    rating: number
+    rating: number,
+    imageUri?: string
   ) => {
     const newTrip: Trip = {
       id: Date.now().toString(),
@@ -43,6 +45,7 @@ export default function HomeScreen() {
       destination,
       date,
       rating,
+      imageUri,
     };
 
     setTrips((prevTrips) => [
@@ -90,8 +93,10 @@ export default function HomeScreen() {
             <Link
               key={trip.id}
               href={{
-            pathname: '/trip/[id]' as any,
-               params: {
+                pathname:
+                  '/trip/[id]' as any,
+
+                params: {
                   id: trip.id,
                   title: trip.title,
                   destination:
@@ -100,6 +105,8 @@ export default function HomeScreen() {
                   rating: String(
                     trip.rating
                   ),
+                  imageUri:
+                    trip.imageUri,
                 },
               }}
               asChild

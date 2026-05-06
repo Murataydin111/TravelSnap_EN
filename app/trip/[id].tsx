@@ -1,4 +1,5 @@
 import {
+    Image,
     Pressable,
     StyleSheet,
     Text,
@@ -25,22 +26,32 @@ export default function TripDetailScreen() {
     destination,
     date,
     rating,
+    imageUri,
   } = useLocalSearchParams<{
     title: string;
     destination: string;
     date: string;
     rating: string;
+    imageUri?: string;
   }>();
 
   return (
     <>
       <Stack.Screen
         options={{
-          title: title || 'Trip Details',
+          title:
+            title || 'Trip Details',
         }}
       />
 
       <View style={styles.container}>
+        {imageUri ? (
+          <Image
+            source={{ uri: imageUri }}
+            style={styles.heroImage}
+          />
+        ) : null}
+
         <Text style={styles.title}>
           {title}
         </Text>
@@ -77,7 +88,9 @@ export default function TripDetailScreen() {
 
         <Pressable
           style={styles.button}
-          onPress={() => router.back()}
+          onPress={() =>
+            router.back()
+          }
         >
           <Text style={styles.buttonText}>
             Back to list
@@ -92,9 +105,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
 
-    backgroundColor: Colors.background,
+    backgroundColor:
+      Colors.background,
 
     padding: 20,
+  },
+
+  heroImage: {
+    width: '100%',
+
+    height: 250,
+
+    borderRadius: 16,
+
+    marginBottom: 20,
   },
 
   title: {
@@ -130,7 +154,8 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 40,
 
-    backgroundColor: Colors.primary,
+    backgroundColor:
+      Colors.primary,
 
     padding: 14,
 
