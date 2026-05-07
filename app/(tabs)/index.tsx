@@ -1,11 +1,11 @@
-import { useState } from 'react';
-
 import {
+  ActivityIndicator,
   Pressable,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
+  View,
 } from 'react-native';
 
 import { Link } from 'expo-router';
@@ -16,53 +16,28 @@ import ScreenHeader from '../../components/ScreenHeader';
 import TripCard from '../../components/TripCard';
 import TripStats from '../../components/TripStats';
 
+import { useTrips } from '../../context/TripContext';
+
 import { Colors } from '../../constants/Colors';
 
-interface Trip {
-  id: string;
-  title: string;
-  destination: string;
-  date: string;
-  rating: number;
-  imageUri?: string;
-}
-
 export default function HomeScreen() {
-  const [trips, setTrips] = useState<
-    Trip[]
-  >([]);
+  const {
+    trips,
+    addTrip,
+    loading,
+    deleteTrip,
+  } = useTrips();
 
-  const handleAddTrip = (
-    title: string,
-    destination: string,
-    date: string,
-    rating: number,
-    imageUri?: string
-  ) => {
-    const newTrip: Trip = {
-      id: Date.now().toString(),
-      title,
-      destination,
-      date,
-      rating,
-      imageUri,
-    };
-
-    setTrips((prevTrips) => [
-      newTrip,
-      ...prevTrips,
-    ]);
-  };
-
-  const handleDeleteTrip = (
-    id: string
-  ) => {
-    setTrips((prevTrips) =>
-      prevTrips.filter(
-        (trip) => trip.id !== id
-      )
+  if (loading) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator
+          size="large"
+          color={Colors.primary}
+        />
+      </View>
     );
-  };
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -83,8 +58,22 @@ export default function HomeScreen() {
         <TripStats trips={trips} />
 
         <AddTripForm
-          onAdd={handleAddTrip}
-        />
+  onAdd={(
+    title,
+    destination,
+    date,
+    rating,
+    imageUri
+  ) =>
+    addTrip({
+      title,
+      destination,
+      date,
+      rating,
+      imageUri,
+    })
+  }
+/>
 
         {trips.length === 0 ? (
           <EmptyState />
@@ -115,7 +104,7 @@ export default function HomeScreen() {
                 <TripCard
                   {...trip}
                   onDelete={() =>
-                    handleDeleteTrip(
+                    deleteTrip(
                       trip.id
                     )
                   }
@@ -130,6 +119,17 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  loader: {
+    flex: 1,
+
+    justifyContent: 'center',
+
+    alignItems: 'center',
+
+    backgroundColor:
+      Colors.background,
+  },
+
   safeArea: {
     flex: 1,
 

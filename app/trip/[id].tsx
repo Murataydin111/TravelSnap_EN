@@ -1,4 +1,5 @@
 import {
+    Alert,
     Image,
     Pressable,
     StyleSheet,
@@ -16,44 +17,78 @@ import { Ionicons } from '@expo/vector-icons';
 
 import RatingStars from '../../components/RatingStars';
 
+import { useTrips } from '../../context/TripContext';
+
 import { Colors } from '../../constants/Colors';
 
 export default function TripDetailScreen() {
   const router = useRouter();
 
+  const { id } =
+    useLocalSearchParams<{
+      id: string;
+    }>();
+
   const {
-    title,
-    destination,
-    date,
-    rating,
-    imageUri,
-  } = useLocalSearchParams<{
-    title: string;
-    destination: string;
-    date: string;
-    rating: string;
-    imageUri?: string;
-  }>();
+    trips,
+    deleteTrip,
+  } = useTrips();
+
+  const trip = trips.find(
+    (t) => t.id === id
+  );
+
+  if (!trip) {
+    return null;
+  }
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Trip',
+      'This action cannot be undone. Are you sure?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+
+        {
+          text: 'Delete',
+
+          style: 'destructive',
+
+          onPress: async () => {
+            await deleteTrip(id);
+
+            router.back();
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <>
       <Stack.Screen
         options={{
           title:
-            title || 'Trip Details',
+            trip.title ||
+            'Trip Details',
         }}
       />
 
       <View style={styles.container}>
-        {imageUri ? (
+        {trip.imageUri ? (
           <Image
-            source={{ uri: imageUri }}
+            source={{
+              uri: trip.imageUri,
+            }}
             style={styles.heroImage}
           />
         ) : null}
 
         <Text style={styles.title}>
-          {title}
+          {trip.title}
         </Text>
 
         <View style={styles.row}>
@@ -64,7 +99,7 @@ export default function TripDetailScreen() {
           />
 
           <Text style={styles.metaText}>
-            {destination}
+            {trip.destination}
           </Text>
         </View>
 
@@ -76,13 +111,13 @@ export default function TripDetailScreen() {
           />
 
           <Text style={styles.metaText}>
-            {date}
+            {trip.date}
           </Text>
         </View>
 
         <View style={styles.ratingContainer}>
           <RatingStars
-            rating={Number(rating)}
+            rating={trip.rating}
           />
         </View>
 
@@ -94,6 +129,25 @@ export default function TripDetailScreen() {
         >
           <Text style={styles.buttonText}>
             Back to list
+          </Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.deleteButton}
+          onPress={handleDelete}
+        >
+          <Ionicons
+            name="trash-outline"
+            size={18}
+            color="white"
+          />
+
+          <Text
+            style={
+              styles.deleteButtonText
+            }
+          >
+            Delete Trip
           </Text>
         </Pressable>
       </View>
@@ -168,6 +222,31 @@ const styles = StyleSheet.create({
     color: Colors.background,
 
     fontSize: 16,
+
+    fontWeight: 'bold',
+  },
+
+  deleteButton: {
+    marginTop: 16,
+
+    backgroundColor:
+      Colors.accent,
+
+    padding: 14,
+
+    borderRadius: 10,
+
+    flexDirection: 'row',
+
+    justifyContent: 'center',
+
+    alignItems: 'center',
+
+    gap: 8,
+  },
+
+  deleteButtonText: {
+    color: 'white',
 
     fontWeight: 'bold',
   },
