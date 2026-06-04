@@ -1,11 +1,11 @@
-import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 import type { Trip, TripData } from '@/types/trip';
 
 interface TripContextValue {
   trips: Trip[];
-  addTrip: (data: TripData, id: string) => void;
+  addTrip: (data: TripData) => void;
   updateTrip: (id: string, patch: Partial<TripData>) => void;
   deleteTrip: (id: string) => void;
 }
@@ -19,23 +19,43 @@ interface TripProviderProps {
 export function TripProvider({ children }: TripProviderProps) {
   const [trips, setTrips] = useState<Trip[]>([]);
 
-  const addTrip = (data: TripData, id: string): void => {
-    const newTrip: Trip = { id, ...data };
+  const addTrip = (data: TripData): void => {
+    const newTrip: Trip = {
+      id: Date.now().toString(),
+      ...data,
+    };
+
     setTrips((current) => [newTrip, ...current]);
   };
 
-  const updateTrip = (id: string, patch: Partial<TripData>): void => {
+  const updateTrip = (
+    id: string,
+    patch: Partial<TripData>
+  ): void => {
     setTrips((current) =>
-      current.map((trip) => (trip.id === id ? { ...trip, ...patch } : trip))
+      current.map((trip) =>
+        trip.id === id
+          ? { ...trip, ...patch }
+          : trip
+      )
     );
   };
 
   const deleteTrip = (id: string): void => {
-    setTrips((current) => current.filter((trip) => trip.id !== id));
+    setTrips((current) =>
+      current.filter((trip) => trip.id !== id)
+    );
   };
 
   return (
-    <TripContext.Provider value={{ trips, addTrip, updateTrip, deleteTrip }}>
+    <TripContext.Provider
+      value={{
+        trips,
+        addTrip,
+        updateTrip,
+        deleteTrip,
+      }}
+    >
       {children}
     </TripContext.Provider>
   );
@@ -43,8 +63,12 @@ export function TripProvider({ children }: TripProviderProps) {
 
 export function useTrips(): TripContextValue {
   const context = useContext(TripContext);
+
   if (!context) {
-    throw new Error('useTrips must be used within a TripProvider');
+    throw new Error(
+      'useTrips must be used within a TripProvider'
+    );
   }
+
   return context;
 }

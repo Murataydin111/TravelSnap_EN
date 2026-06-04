@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Colors } from '@/constants/Colors';
 
@@ -12,12 +12,26 @@ interface EmptyStateProps {
   subtitle: string;
 }
 
-export default function EmptyState({ icon, title, subtitle }: EmptyStateProps) {
+export default function EmptyState({
+  icon,
+  title,
+  subtitle,
+}: EmptyStateProps) {
   return (
     <View style={styles.container}>
-      <Ionicons name={icon} size={64} color={Colors.primary} />
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.subtitle}>{subtitle}</Text>
+      <Ionicons
+        name={icon}
+        size={64}
+        color={Colors.primary}
+      />
+
+      <Text style={styles.title}>
+        {title}
+      </Text>
+
+      <Text style={styles.subtitle}>
+        {subtitle}
+      </Text>
     </View>
   );
 }
@@ -29,13 +43,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
+
   title: {
     color: Colors.textPrimary,
     fontSize: 20,
     fontWeight: 'bold',
   },
+
   subtitle: {
     color: Colors.textSecondary,
     fontSize: 14,
+    textAlign: 'center',
   },
 });
