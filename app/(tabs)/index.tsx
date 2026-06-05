@@ -61,21 +61,7 @@ export default function HomeScreen() {
         <TripStats trips={trips} />
 
         <AddTripForm
-  onAdd={(
-    title,
-    destination,
-    date,
-    rating,
-    imageUri
-  ) =>
-    addTrip({
-      title,
-      destination,
-      date,
-      rating,
-      imageUri,
-    })
-  }
+  onAdd={(trip) => addTrip(trip)}
 />
 
         {trips.length === 0 ? (
