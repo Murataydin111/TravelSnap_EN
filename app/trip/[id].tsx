@@ -20,7 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import CountryCard from '../../components/CountryCard';
 import RatingStars from '../../components/RatingStars';
 
-import { useTrips } from '../../contexts/TripContext';
+import { useTrips } from '../../context/TripContext';
 
 import { useFetch } from '../../hooks/useFetch';
 

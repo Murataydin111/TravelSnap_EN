@@ -4,8 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AddTripForm from '@/components/AddTripForm';
 import { Colors } from '@/constants/Colors';
-import { useTrips } from '@/contexts/TripContext';
 import type { TripData } from '@/types/trip';
+import { useTrips } from '../context/TripContext';
 
 export default function AddTripScreen() {
   const { addTrip } = useTrips();

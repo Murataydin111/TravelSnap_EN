@@ -1,14 +1,14 @@
+import { Ionicons } from '@expo/vector-icons';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Animated, Dimensions, FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Stack, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 
-import { useTrips } from '@/contexts/TripContext';
+import PhotoViewerModal from '@/components/PhotoViewerModal';
+import { Colors } from '@/constants/Colors';
 import { useImagePicker } from '@/hooks/useImagePicker';
 import { useScrollFab } from '@/hooks/useScrollFab';
 import { deleteImage } from '@/utils/imageStorage';
-import PhotoViewerModal from '@/components/PhotoViewerModal';
-import { Colors } from '@/constants/Colors';
+import { useTrips } from '../../../context/TripContext';
 
 const { width } = Dimensions.get('window');
 const THUMB_SIZE = (width - 16) / 3;
