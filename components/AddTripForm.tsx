@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Alert,
   Image,
@@ -78,6 +78,14 @@ export default function AddTripForm({
 
   const [imageUri, setImageUri] =
     useState<string | undefined>();
+    const destinationRef =
+  useRef<TextInput>(null);
+
+const dateRef =
+  useRef<TextInput>(null);
+
+const ratingRef =
+  useRef<TextInput>(null);
 
   const { handleAddPhoto } =
     useImagePicker({
@@ -172,53 +180,66 @@ export default function AddTripForm({
       {step === 1 && (
         <>
           <TextInput
-            style={styles.input}
-            placeholder="Title"
-            placeholderTextColor={
-              Colors.textSecondary
-            }
-            value={title}
-            onChangeText={setTitle}
-          />
+  style={styles.input}
+  placeholder="Title"
+  autoFocus
+  returnKeyType="next"
+  onSubmitEditing={() =>
+    destinationRef.current?.focus()
+  }
+  placeholderTextColor={
+    Colors.textSecondary
+  }
+  value={title}
+  onChangeText={setTitle}
+/>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Destination"
-            placeholderTextColor={
-              Colors.textSecondary
-            }
-            value={destination}
-            onChangeText={
-              setDestination
-            }
-          />
+         <TextInput
+  style={styles.input}
+  placeholder="Destination"
+  placeholderTextColor={
+    Colors.textSecondary
+  }
+  value={destination}
+  onChangeText={
+    setDestination
+  }
+  ref={destinationRef}
+  returnKeyType="done"
+/>
         </>
       )}
 
       {step === 2 && (
         <>
           <TextInput
-            style={styles.input}
-            placeholder="Date (YYYY-MM-DD)"
-            placeholderTextColor={
-              Colors.textSecondary
-            }
-            value={date}
-            onChangeText={setDate}
-          />
+  style={styles.input}
+  placeholder="Date (YYYY-MM-DD)"
+  autoFocus
+  placeholderTextColor={
+    Colors.textSecondary
+  }
+  value={date}
+  onChangeText={setDate}
+  ref={dateRef}
+  returnKeyType="next"
+  onSubmitEditing={() =>
+    ratingRef.current?.focus()
+  }
+/>
 
           <TextInput
-            style={styles.input}
-            placeholder="Rating (1-5)"
-            placeholderTextColor={
-              Colors.textSecondary
-            }
-            value={rating}
-            onChangeText={
-              setRating
-            }
-            keyboardType="numeric"
-          />
+  style={styles.input}
+  placeholder="Rating (1-5)"
+  placeholderTextColor={
+    Colors.textSecondary
+  }
+  value={rating}
+  onChangeText={setRating}
+  keyboardType="numeric"
+  ref={ratingRef}
+  returnKeyType="done"
+/>
         </>
       )}
 

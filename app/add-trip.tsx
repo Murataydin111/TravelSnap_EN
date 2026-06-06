@@ -1,5 +1,10 @@
 import { useRouter } from 'expo-router';
-import { ScrollView, StyleSheet } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import AddTripForm from '@/components/AddTripForm';
@@ -24,11 +29,24 @@ export default function AddTripScreen() {
       style={styles.safeArea}
       edges={['bottom']}
     >
-      <ScrollView
-        contentContainerStyle={styles.content}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={
+          Platform.OS === 'ios'
+            ? 'padding'
+            : 'height'
+        }
       >
-        <AddTripForm onAdd={handleAdd} />
-      </ScrollView>
+        <ScrollView
+          contentContainerStyle={
+            styles.content
+          }
+        >
+          <AddTripForm
+            onAdd={handleAdd}
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -36,7 +54,8 @@ export default function AddTripScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor:
+      Colors.background,
   },
 
   content: {
