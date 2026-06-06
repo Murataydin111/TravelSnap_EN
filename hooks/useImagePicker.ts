@@ -1,5 +1,5 @@
-import { Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { Alert } from 'react-native';
 
 import { saveImageToTrip } from '@/utils/imageStorage';
 
@@ -11,17 +11,38 @@ interface UseImagePickerOptions {
 
 export function useImagePicker({ tripId, onSaved, aspect = [4, 3] }: UseImagePickerOptions) {
   const pickImage = async (): Promise<void> => {
-    const result = await ImagePicker.launchImageLibraryAsync({
+  const { status } =
+    await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+  if (status !== 'granted') {
+    Alert.alert(
+      'Permission denied',
+      'Gallery access is required.'
+    );
+    return;
+  }
+
+  const result =
+    await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
       aspect,
       quality: 0.8,
     });
-    if (!result.canceled && result.assets[0]) {
-      const saved = await saveImageToTrip(result.assets[0].uri, tripId);
-      onSaved(saved);
-    }
-  };
+
+  if (
+    !result.canceled &&
+    result.assets[0]
+  ) {
+    const saved =
+      await saveImageToTrip(
+        result.assets[0].uri,
+        tripId
+      );
+
+    onSaved(saved);
+  }
+};
 
   const takePhoto = async (): Promise<void> => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
