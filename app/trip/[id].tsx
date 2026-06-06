@@ -191,26 +191,49 @@ export default function TripDetailScreen() {
         ) : null}
 
         <Pressable
-          style={styles.button}
-          onPress={() =>
-            router.back()
-          }
-        >
-          <Text
-            style={
-              styles.buttonText
-            }
-          >
-            Back to list
-          </Text>
-        </Pressable>
+  style={styles.button}
+  onPress={() =>
+    router.back()
+  }
+>
+  <Text
+    style={
+      styles.buttonText
+    }
+  >
+    Back to list
+  </Text>
+</Pressable>
 
-        <Pressable
-          style={
-            styles.deleteButton
-          }
-          onPress={handleDelete}
-        >
+<Pressable
+  style={styles.editButton}
+  onPress={() =>
+    router.push(
+      `/trip/edit/${trip.id}`
+    )
+  }
+>
+  <Text
+    style={
+      styles.editButtonText
+    }
+  >
+    Edit Trip
+  </Text>
+</Pressable>
+<Pressable
+  style={
+    styles.deleteButton
+  }
+  onPress={handleDelete}
+></Pressable>
+
+<Pressable
+  style={
+    styles.deleteButton
+  }
+  onPress={handleDelete}
+>
           <Ionicons
             name="trash-outline"
             size={18}
@@ -286,6 +309,20 @@ const styles =
       fontSize: 16,
       fontWeight: 'bold',
     },
+    editButton: {
+  marginTop: 16,
+  backgroundColor:
+    Colors.primary,
+  padding: 14,
+  borderRadius: 10,
+  alignItems: 'center',
+},
+
+editButtonText: {
+  color:
+    Colors.background,
+  fontWeight: 'bold',
+},
 
     deleteButton: {
       marginTop: 16,

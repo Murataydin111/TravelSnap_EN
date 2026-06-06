@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Colors } from '../constants/Colors';
 import { TripProvider } from '../context/TripContext';
 
+
 const darkHeaderOptions = {
   headerStyle: { backgroundColor: Colors.background },
   headerTintColor: Colors.primary,
@@ -25,6 +26,14 @@ export default function RootLayout() {
             animation: 'slide_from_right',
           }}
         />
+        <Stack.Screen
+  name="trip/edit/[id]"
+  options={{
+    title: 'Edit Trip',
+    animation: 'slide_from_right',
+  }}
+/>
+
 
         <Stack.Screen
           name="add-trip"

@@ -1,16 +1,16 @@
 import {
-    createContext,
-    ReactNode,
-    useContext,
-    useEffect,
-    useState,
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
 } from 'react';
 
 import { Trip, TripData } from '../types/trip';
 
 import {
-    loadTrips,
-    saveTrips,
+  loadTrips,
+  saveTrips,
 } from '../utils/tripStorage';
 
 interface TripContextType {
@@ -65,22 +65,42 @@ export function TripProvider({
   }, []);
 
   const addTrip = async (
-    data: TripData
-  ) => {
-    const newTrip: Trip = {
-      id: Date.now().toString(),
-      ...data,
-    };
+  data: TripData
+) => {
+  const normalizedTitle =
+    data.title
+      .trim()
+      .toLowerCase();
 
-    const updatedTrips = [
-      newTrip,
-      ...trips,
-    ];
+  const alreadyExists =
+    trips.some(
+      (trip) =>
+        trip.title
+          .trim()
+          .toLowerCase() ===
+        normalizedTitle
+    );
 
-    setTrips(updatedTrips);
+  if (alreadyExists) {
+    throw new Error(
+      'This title is already used by another trip'
+    );
+  }
 
-    await saveTrips(updatedTrips);
+  const newTrip: Trip = {
+    id: Date.now().toString(),
+    ...data,
   };
+
+  const updatedTrips = [
+    newTrip,
+    ...trips,
+  ];
+
+  setTrips(updatedTrips);
+
+  await saveTrips(updatedTrips);
+};
 
   const deleteTrip = async (
     id: string
