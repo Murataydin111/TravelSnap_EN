@@ -1,6 +1,14 @@
-import { useState } from 'react';
-import { Alert, Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
+import {
+  Alert,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
 import { Colors } from '@/constants/Colors';
 import { useImagePicker } from '@/hooks/useImagePicker';
@@ -18,45 +26,125 @@ const validate = (
   date: string,
   rating: string
 ): string | null => {
-  if (!title.trim() || !destination.trim() || !date.trim() || !rating.trim())
+  if (
+    !title.trim() ||
+    !destination.trim() ||
+    !date.trim() ||
+    !rating.trim()
+  ) {
     return 'All fields are required!';
-  if (!DATE_REGEX.test(date))
+  }
+
+  if (!DATE_REGEX.test(date)) {
     return 'Date must be in YYYY-MM-DD format!';
+  }
+
   const ratingNum = Number(rating);
-  if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5)
+
+  if (
+    isNaN(ratingNum) ||
+    ratingNum < 1 ||
+    ratingNum > 5
+  ) {
     return 'Rating must be a number between 1 and 5!';
+  }
+
   return null;
 };
 
-export default function AddTripForm({ onAdd }: AddTripFormProps) {
-  const [tripId] = useState(() => Date.now().toString());
-  const [title, setTitle] = useState('');
-  const [destination, setDestination] = useState('');
-  const [date, setDate] = useState('');
-  const [rating, setRating] = useState('');
-  const [imageUri, setImageUri] = useState<string | undefined>();
+export default function AddTripForm({
+  onAdd,
+}: AddTripFormProps) {
+  const [tripId] = useState(() =>
+    Date.now().toString()
+  );
 
-  const { handleAddPhoto } = useImagePicker({
-    tripId,
-    onSaved: setImageUri,
-    aspect: [16, 9],
-  });
+  const [step, setStep] =
+    useState(1);
+
+  const [title, setTitle] =
+    useState('');
+
+  const [
+    destination,
+    setDestination,
+  ] = useState('');
+
+  const [date, setDate] =
+    useState('');
+
+  const [rating, setRating] =
+    useState('');
+
+  const [imageUri, setImageUri] =
+    useState<string | undefined>();
+
+  const { handleAddPhoto } =
+    useImagePicker({
+      tripId,
+      onSaved: setImageUri,
+      aspect: [16, 9],
+    });
+
+  const next = () => {
+    if (
+      step === 1 &&
+      (!title.trim() ||
+        !destination.trim())
+    ) {
+      Alert.alert(
+        'Error',
+        'Fill all fields'
+      );
+      return;
+    }
+
+    if (
+      step === 2 &&
+      (!date.trim() ||
+        !rating.trim())
+    ) {
+      Alert.alert(
+        'Error',
+        'Fill all fields'
+      );
+      return;
+    }
+
+    setStep(step + 1);
+  };
+
+  const prev = () => {
+    setStep(step - 1);
+  };
 
   const handleSubmit = (): void => {
-    const error = validate(title, destination, date, rating);
+    const error = validate(
+      title,
+      destination,
+      date,
+      rating
+    );
+
     if (error) {
-      Alert.alert('Error', error);
+      Alert.alert(
+        'Error',
+        error
+      );
       return;
     }
 
     onAdd(
       {
         title: title.trim(),
-        destination: destination.trim(),
+        destination:
+          destination.trim(),
         date: date.trim(),
         rating: Number(rating),
         imageUri,
-        galleryUris: imageUri ? [imageUri] : [],
+        galleryUris: imageUri
+          ? [imageUri]
+          : [],
       },
       tripId
     );
@@ -66,66 +154,182 @@ export default function AddTripForm({ onAdd }: AddTripFormProps) {
     setDate('');
     setRating('');
     setImageUri(undefined);
+    setStep(1);
   };
 
   return (
     <View style={styles.form}>
-      <Text style={styles.formTitle}>Add new trip</Text>
+      <Text
+        style={styles.formTitle}
+      >
+        Add new trip
+      </Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Title"
-        placeholderTextColor={Colors.textSecondary}
-        value={title}
-        onChangeText={setTitle}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Destination"
-        placeholderTextColor={Colors.textSecondary}
-        value={destination}
-        onChangeText={setDestination}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Date (YYYY-MM-DD)"
-        placeholderTextColor={Colors.textSecondary}
-        value={date}
-        onChangeText={setDate}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Rating (1-5)"
-        placeholderTextColor={Colors.textSecondary}
-        value={rating}
-        onChangeText={setRating}
-        keyboardType="numeric"
-      />
+      <Text style={styles.stepText}>
+        Step {step} / 3
+      </Text>
 
-      {imageUri ? (
-        <View style={styles.previewContainer}>
-          <Image source={{ uri: imageUri }} style={styles.preview} />
-          <Pressable style={styles.changePhotoButton} onPress={handleAddPhoto}>
-            <Text style={styles.changePhotoText}>Change photo</Text>
-          </Pressable>
-        </View>
-      ) : (
-        <Pressable style={styles.photoPlaceholder} onPress={handleAddPhoto}>
-          <Ionicons name="camera-outline" size={32} color={Colors.textSecondary} />
-          <Text style={styles.photoPlaceholderText}>Add a photo</Text>
-        </Pressable>
+      {step === 1 && (
+        <>
+          <TextInput
+            style={styles.input}
+            placeholder="Title"
+            placeholderTextColor={
+              Colors.textSecondary
+            }
+            value={title}
+            onChangeText={setTitle}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Destination"
+            placeholderTextColor={
+              Colors.textSecondary
+            }
+            value={destination}
+            onChangeText={
+              setDestination
+            }
+          />
+        </>
       )}
 
-      <Pressable style={styles.addButton} onPress={handleSubmit}>
-        <Text style={styles.addButtonText}>Add Trip</Text>
-      </Pressable>
+      {step === 2 && (
+        <>
+          <TextInput
+            style={styles.input}
+            placeholder="Date (YYYY-MM-DD)"
+            placeholderTextColor={
+              Colors.textSecondary
+            }
+            value={date}
+            onChangeText={setDate}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Rating (1-5)"
+            placeholderTextColor={
+              Colors.textSecondary
+            }
+            value={rating}
+            onChangeText={
+              setRating
+            }
+            keyboardType="numeric"
+          />
+        </>
+      )}
+
+      {step === 3 && (
+        <>
+          {imageUri ? (
+            <View
+              style={
+                styles.previewContainer
+              }
+            >
+              <Image
+                source={{
+                  uri: imageUri,
+                }}
+                style={
+                  styles.preview
+                }
+              />
+
+              <Pressable
+                style={
+                  styles.changePhotoButton
+                }
+                onPress={
+                  handleAddPhoto
+                }
+              >
+                <Text
+                  style={
+                    styles.changePhotoText
+                  }
+                >
+                  Change photo
+                </Text>
+              </Pressable>
+            </View>
+          ) : (
+            <Pressable
+              style={
+                styles.photoPlaceholder
+              }
+              onPress={
+                handleAddPhoto
+              }
+            >
+              <Ionicons
+                name="camera-outline"
+                size={32}
+                color={
+                  Colors.textSecondary
+                }
+              />
+
+              <Text
+                style={
+                  styles.photoPlaceholderText
+                }
+              >
+                Add a photo
+              </Text>
+            </Pressable>
+          )}
+        </>
+      )}
+
+      <View style={styles.buttonRow}>
+        {step > 1 && (
+          <Pressable
+            style={styles.addButton}
+            onPress={prev}
+          >
+            <Text
+              style={
+                styles.addButtonText
+              }
+            >
+              Back
+            </Text>
+          </Pressable>
+        )}
+
+        <Pressable
+          style={styles.addButton}
+          onPress={() => {
+            if (step < 3) {
+              next();
+            } else {
+              handleSubmit();
+            }
+          }}
+        >
+          <Text
+            style={
+              styles.addButtonText
+            }
+          >
+            {step === 3
+              ? 'Add Trip'
+              : 'Next'}
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   form: {
-    backgroundColor: Colors.card,
+    backgroundColor:
+      Colors.card,
     padding: 16,
     borderRadius: 16,
     marginBottom: 24,
@@ -134,25 +338,40 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
+
   formTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 16,
-    color: Colors.textPrimary,
+    marginBottom: 8,
+    color:
+      Colors.textPrimary,
   },
+
+  stepText: {
+    textAlign: 'center',
+    marginBottom: 16,
+    color:
+      Colors.textSecondary,
+  },
+
   input: {
-    backgroundColor: Colors.inputBg,
+    backgroundColor:
+      Colors.inputBg,
     borderWidth: 1,
-    borderColor: Colors.inputBorder,
+    borderColor:
+      Colors.inputBorder,
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
     fontSize: 16,
-    color: Colors.textPrimary,
+    color:
+      Colors.textPrimary,
   },
+
   photoPlaceholder: {
     borderWidth: 1.5,
-    borderColor: Colors.inputBorder,
+    borderColor:
+      Colors.inputBorder,
     borderStyle: 'dashed',
     borderRadius: 8,
     height: 100,
@@ -161,39 +380,57 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 12,
   },
+
   photoPlaceholderText: {
-    color: Colors.textSecondary,
+    color:
+      Colors.textSecondary,
     fontSize: 14,
   },
+
   previewContainer: {
     marginBottom: 12,
     gap: 8,
   },
+
   preview: {
     width: '100%',
     height: 200,
     borderRadius: 8,
   },
+
   changePhotoButton: {
     alignItems: 'center',
     paddingVertical: 8,
     borderRadius: 8,
-    backgroundColor: Colors.inputBg,
+    backgroundColor:
+      Colors.inputBg,
   },
+
   changePhotoText: {
-    color: Colors.primary,
+    color:
+      Colors.primary,
     fontSize: 14,
     fontWeight: '600',
   },
+
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+
   addButton: {
-    backgroundColor: Colors.accent,
+    flex: 1,
+    backgroundColor:
+      Colors.accent,
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 8,
   },
+
   addButtonText: {
-    color: Colors.textPrimary,
+    color:
+      Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 16,
   },
