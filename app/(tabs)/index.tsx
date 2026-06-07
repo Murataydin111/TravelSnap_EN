@@ -1,8 +1,9 @@
+import { useCallback } from 'react';
 import {
   ActivityIndicator,
+  FlatList,
   Pressable,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   View,
@@ -20,6 +21,8 @@ import { useTrips } from '../../context/TripContext';
 
 import { Colors } from '../../constants/Colors';
 
+const CARD_HEIGHT = 300;
+
 export default function HomeScreen() {
   const {
     trips,
@@ -27,6 +30,12 @@ export default function HomeScreen() {
     loading,
     deleteTrip,
   } = useTrips();
+  const handleDelete = useCallback(
+  (id: string) => {
+    deleteTrip(id);
+  },
+  [deleteTrip]
+);
 
   if (loading) {
     return (
@@ -45,69 +54,67 @@ export default function HomeScreen() {
         barStyle="light-content"
       />
 
-      <ScrollView
-        style={styles.container}
-        // REVIEW: ScrollView renders all cards at once.
-        // Why it can be a problem: large trip lists will hurt performance/memory.
-        // How to fix: use FlatList for virtualization when list size grows.
+      <FlatList
+        data={trips}
+        keyExtractor={(item) => item.id}
         contentContainerStyle={
           styles.contentContainer
         }
-      >
-        <ScreenHeader
-          tripCount={trips.length}
-        />
+        ListHeaderComponent={
+          <>
+            <ScreenHeader
+              tripCount={trips.length}
+            />
 
-        <TripStats trips={trips} />
+            <TripStats trips={trips} />
 
-        <AddTripForm
-  onAdd={(trip) => addTrip(trip)}
-/>
-
-        {trips.length === 0 ? (
+            <AddTripForm
+              onAdd={(trip) =>
+                addTrip(trip)
+              }
+            />
+          </>
+        }
+        ListEmptyComponent={
           <EmptyState />
-        ) : (
-          trips.map((trip) => (
-            <Link
-              key={trip.id}
-              href={{
-                // REVIEW: `as any` hides route typing errors.
-                // How to fix: use proper Expo Router typed route instead of casting.
-                pathname:
-                  '/trip/[id]' as any,
-
-                params: {
-                  id: trip.id,
-                  // REVIEW: These params are currently unused in trip detail screen
-                  // (screen resolves trip by id from context), so this is dead payload.
-                  // How to fix: pass only `id` unless detail screen starts using others.
-                  title: trip.title,
-                  destination:
-                    trip.destination,
-                  date: trip.date,
-                  rating: String(
-                    trip.rating
-                  ),
-                  imageUri:
-                    trip.imageUri,
-                },
-              }}
-              asChild
-            >
-              <Pressable>
-                <TripCard
-                  {...trip}
-                  onDelete={() =>
-                    deleteTrip(
-                      trip.id
-                    )
-                  }
-                />
-              </Pressable>
-            </Link>
-          ))
-        )}
-      </ScrollView>
+        }
+        getItemLayout={(
+          _,
+          index
+        ) => ({
+          length: CARD_HEIGHT,
+          offset:
+            CARD_HEIGHT * index,
+          index,
+        })}
+        initialNumToRender={10}
+        windowSize={5}
+        maxToRenderPerBatch={8}
+        removeClippedSubviews
+        renderItem={({ item }) => (
+  <Link
+    href={{
+      pathname:
+        '/trip/[id]' as any,
+      params: {
+        id: item.id,
+      },
+    }}
+    asChild
+  >
+    <Pressable>
+      <TripCard
+        {...item}
+        onDelete={() =>
+          handleDelete(
+            item.id
+          )
+        }
+      />
+    </Pressable>
+  </Link>
+)}
+      />
     </SafeAreaView>
   );
 }
@@ -125,13 +132,6 @@ const styles = StyleSheet.create({
   },
 
   safeArea: {
-    flex: 1,
-
-    backgroundColor:
-      Colors.background,
-  },
-
-  container: {
     flex: 1,
 
     backgroundColor:
