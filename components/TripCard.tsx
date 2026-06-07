@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { Image } from 'expo-image';
 import {
-  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -44,9 +44,11 @@ const TripCard = React.memo(function TripCard({
     <View style={styles.card}>
       {imageUri && (
         <Image
-          source={{ uri: imageUri }}
-          style={styles.cardImage}
-        />
+  source={imageUri}
+  style={styles.cardImage}
+  contentFit="cover"
+  transition={300}
+/>
       )}
 
       {galleryCount > 0 && (
