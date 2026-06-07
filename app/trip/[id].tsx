@@ -1,7 +1,7 @@
+import { Image } from 'expo-image';
 import {
   ActivityIndicator,
   Alert,
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -131,11 +131,18 @@ export default function TripDetailScreen() {
           />
         ) : heroImage ? (
           <Image
-            source={{
-              uri: heroImage,
-            }}
-            style={styles.heroImage}
-          />
+  source={{
+    uri: heroImage,
+  }}
+  placeholder={{
+    blurhash:
+      'LGF5]+Yk^6#M@-5c,1J5@[or[Q6.'
+  }}
+  contentFit="cover"
+  cachePolicy="memory-disk"
+  transition={300}
+  style={styles.heroImage}
+/>
         ) : null}
 
         <Text style={styles.title}>
@@ -221,12 +228,6 @@ export default function TripDetailScreen() {
     Edit Trip
   </Text>
 </Pressable>
-<Pressable
-  style={
-    styles.deleteButton
-  }
-  onPress={handleDelete}
-></Pressable>
 
 <Pressable
   style={
