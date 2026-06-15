@@ -1,9 +1,15 @@
 import {
     ActivityIndicator,
+    Image,
     StyleSheet,
     Text,
     View,
 } from 'react-native';
+
+import {
+    useEffect,
+    useRef,
+} from 'react';
 
 import MapView, {
     Callout,
@@ -23,6 +29,47 @@ export default function MapScreen() {
   const { trips } =
     useTrips();
 
+  const mapRef =
+    useRef<MapView>(null);
+
+  useEffect(() => {
+    const tripsWithCoords =
+      trips.filter(
+        (trip) =>
+          trip.coordinates
+      );
+
+    if (
+      tripsWithCoords.length === 0
+    ) {
+      return;
+    }
+
+    setTimeout(() => {
+      mapRef.current?.fitToCoordinates(
+        tripsWithCoords.map(
+          (trip) => ({
+            latitude:
+              trip.coordinates!
+                .latitude,
+            longitude:
+              trip.coordinates!
+                .longitude,
+          })
+        ),
+        {
+          edgePadding: {
+            top: 80,
+            right: 80,
+            bottom: 80,
+            left: 80,
+          },
+          animated: true,
+        }
+      );
+    }, 500);
+  }, [trips]);
+
   if (loading) {
     return (
       <View style={styles.loader}>
@@ -37,16 +84,17 @@ export default function MapScreen() {
   return (
     <View style={styles.container}>
       <MapView
+        ref={mapRef}
         style={styles.map}
         showsUserLocation
         initialRegion={{
           latitude:
             location?.coords
-              .latitude ??
+              ?.latitude ??
             52.2297,
           longitude:
             location?.coords
-              .longitude ??
+              ?.longitude ??
             21.0122,
           latitudeDelta: 0.1,
           longitudeDelta: 0.1,
@@ -72,16 +120,39 @@ export default function MapScreen() {
               }}
             >
               <Callout>
-                <View>
-                  <Text>
-                    {trip.title}
-                  </Text>
+                <View
+                  style={
+                    styles.calloutContainer
+                  }
+                >
+                  {trip.imageUri ? (
+                    <Image
+                      source={{
+                        uri: trip.imageUri,
+                      }}
+                      style={
+                        styles.calloutImage
+                      }
+                    />
+                  ) : null}
 
-                  <Text>
-                    {
-                      trip.destination
-                    }
-                  </Text>
+                  <View>
+                    <Text
+                      style={
+                        styles.calloutTitle
+                      }
+                    >
+                      {trip.title}
+                    </Text>
+
+                    <Text
+                      style={
+                        styles.calloutDestination
+                      }
+                    >
+                      {trip.destination}
+                    </Text>
+                  </View>
                 </View>
               </Callout>
             </Marker>
@@ -130,5 +201,27 @@ const styles = StyleSheet.create({
     color:
       Colors.textPrimary,
     fontWeight: 'bold',
+  },
+
+  calloutContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    maxWidth: 200,
+  },
+
+  calloutImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+  },
+
+  calloutTitle: {
+    fontWeight: 'bold',
+  },
+
+  calloutDestination: {
+    color:
+      Colors.textSecondary,
   },
 });

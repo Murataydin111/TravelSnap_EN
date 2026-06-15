@@ -13,6 +13,7 @@ import {
 import { Colors } from '@/constants/Colors';
 import { useImagePicker } from '@/hooks/useImagePicker';
 import type { TripData } from '@/types/trip';
+import { getCoordinates } from '@/utils/geocoding';
 
 interface AddTripFormProps {
   onAdd: (trip: TripData, id: string) => void;
@@ -126,7 +127,7 @@ const ratingRef =
     setStep(step - 1);
   };
 
-  const handleSubmit = (): void => {
+  const handleSubmit = async (): Promise<void> => {
     const error = validate(
       title,
       destination,
@@ -141,20 +142,24 @@ const ratingRef =
       );
       return;
     }
+    const coordinates =
+  await getCoordinates(
+    destination.trim()
+  );
 
     onAdd(
-      {
-        title: title.trim(),
-        destination:
-          destination.trim(),
-        date: date.trim(),
-        rating: Number(rating),
-        imageUri,
-        galleryUris: imageUri
-          ? [imageUri]
-          : [],
-      },
-      tripId
+        {
+  title: title.trim(),
+  destination: destination.trim(),
+  date: date.trim(),
+  rating: Number(rating),
+  imageUri,
+  galleryUris: imageUri
+    ? [imageUri]
+    : [],
+  coordinates,
+},
+     tripId
     );
 
     setTitle('');
