@@ -78,7 +78,10 @@ export default function HomeScreen() {
         maxToRenderPerBatch={8}
         removeClippedSubviews
       renderItem={({ item, index }) => (
-  <AnimatedTripCard index={index}>
+  <AnimatedTripCard
+  index={index}
+  onDelete={() => handleDelete(item.id)}
+>
     <Link
       href={{
         pathname: '/trip/[id]' as any,
