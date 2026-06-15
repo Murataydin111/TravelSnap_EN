@@ -13,10 +13,11 @@ import Animated from 'react-native-reanimated';
 import AddTripForm from '../../components/AddTripForm';
 import AnimatedTripCard from '../../components/AnimatedTripCard';
 import EmptyState from '../../components/EmptyState';
+import FAB from '../../components/FAB';
 import ScreenHeader from '../../components/ScreenHeader';
+import TripCard from '../../components/TripCard';
 import TripStats from '../../components/TripStats';
 
-import TripCard from '../../components/TripCard';
 import { Colors } from '../../constants/Colors';
 import { useTrips } from '../../context/TripContext';
 
@@ -77,32 +78,37 @@ export default function HomeScreen() {
         windowSize={5}
         maxToRenderPerBatch={8}
         removeClippedSubviews
-      renderItem={({ item, index }) => (
-  <AnimatedTripCard
-  index={index}
-  onDelete={() => handleDelete(item.id)}
->
-    <Link
-      href={{
-        pathname: '/trip/[id]' as any,
-        params: {
-          id: item.id,
-        },
-      }}
-      asChild
-    >
-      <Pressable>
-        <TripCard
-          {...item}
-          onDelete={() =>
-            handleDelete(item.id)
-          }
-        />
-      </Pressable>
-    </Link>
-  </AnimatedTripCard>
-)}
+        renderItem={({ item, index }) => (
+          <AnimatedTripCard
+            index={index}
+            onDelete={() =>
+              handleDelete(item.id)
+            }
+          >
+            <Link
+              href={{
+                pathname:
+                  '/trip/[id]' as any,
+                params: {
+                  id: item.id,
+                },
+              }}
+              asChild
+            >
+              <Pressable>
+                <TripCard
+                  {...item}
+                  onDelete={() =>
+                    handleDelete(item.id)
+                  }
+                />
+              </Pressable>
+            </Link>
+          </AnimatedTripCard>
+        )}
       />
+
+      <FAB />
     </SafeAreaView>
   );
 }
