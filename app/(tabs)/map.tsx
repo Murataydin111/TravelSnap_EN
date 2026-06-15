@@ -11,7 +11,9 @@ import {
     useRef,
 } from 'react';
 
-import MapView, {
+import ClusteredMapView from 'react-native-map-clustering';
+
+import {
     Callout,
     Marker,
 } from 'react-native-maps';
@@ -25,12 +27,36 @@ export default function MapScreen() {
     location,
     loading,
   } = useLocation();
+  const DARK_MAP_STYLE = [
+  {
+    elementType: 'geometry',
+    stylers: [{ color: '#1d2c4d' }],
+  },
+  {
+    elementType: 'labels.text.fill',
+    stylers: [{ color: '#8ec3b9' }],
+  },
+  {
+    elementType: 'labels.text.stroke',
+    stylers: [{ color: '#1a3646' }],
+  },
+  {
+    featureType: 'road',
+    elementType: 'geometry',
+    stylers: [{ color: '#304a7d' }],
+  },
+  {
+    featureType: 'water',
+    elementType: 'geometry',
+    stylers: [{ color: '#0e1626' }],
+  },
+];
 
   const { trips } =
     useTrips();
 
   const mapRef =
-    useRef<MapView>(null);
+  useRef<any>(null);
 
   useEffect(() => {
     const tripsWithCoords =
@@ -83,23 +109,28 @@ export default function MapScreen() {
 
   return (
     <View style={styles.container}>
-  <MapView
-    ref={mapRef}
-    style={styles.map}
-    showsUserLocation
-    initialRegion={{
-      latitude:
-        location?.coords
-          ?.latitude ??
-        52.2297,
-      longitude:
-        location?.coords
-          ?.longitude ??
-        21.0122,
-      latitudeDelta: 0.1,
-      longitudeDelta: 0.1,
-    }}
-  >
+  <ClusteredMapView
+  ref={mapRef}
+  clusteringEnabled
+  radius={50}
+  spiralEnabled
+  animationEnabled
+  customMapStyle={DARK_MAP_STYLE}
+  style={styles.map}
+  showsUserLocation
+  initialRegion={{
+    latitude:
+      location?.coords
+        ?.latitude ??
+      52.2297,
+    longitude:
+      location?.coords
+        ?.longitude ??
+      21.0122,
+    latitudeDelta: 0.1,
+    longitudeDelta: 0.1,
+  }}
+>
             {trips
           .filter(
             (trip) =>
@@ -184,7 +215,7 @@ export default function MapScreen() {
               </Callout>
             </Marker>
           ))}
-      </MapView>
+      </ClusteredMapView>
 
       <View style={styles.overlay}>
         <Text style={styles.text}>

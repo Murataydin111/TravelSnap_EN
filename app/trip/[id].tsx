@@ -38,6 +38,8 @@ import type {
   UnsplashResponse,
 } from '../../types/unsplash';
 
+import * as Location from 'expo-location';
+import { useEffect, useState } from 'react';
 import { Colors } from '../../constants/Colors';
 
 export default function TripDetailScreen() {
@@ -77,18 +79,55 @@ export default function TripDetailScreen() {
         )}?fullText=false`
       : ''
   );
+  const heroImage =
+  photoData?.results?.[0]?.urls
+    ?.regular ||
+  trip?.imageUri;
 
-  if (!trip) {
-    return null;
+const country =
+  countryData?.[0];
+
+const [address, setAddress] =
+  useState('');
+
+const [addressLoading, setAddressLoading] =
+  useState(false);
+
+useEffect(() => {
+  if (!trip?.coordinates) {
+    return;
   }
 
-  const heroImage =
-    photoData?.results?.[0]?.urls
-      ?.regular ||
-    trip.imageUri;
+  (async () => {
+    try {
+      setAddressLoading(true);
 
-  const country =
-    countryData?.[0];
+      const result =
+        await Location.reverseGeocodeAsync(
+          trip.coordinates!
+        );
+
+      if (result.length > 0) {
+        const place = result[0];
+
+        const formatted = [
+          place.street,
+          place.city,
+          place.region,
+          place.country,
+        ]
+          .filter(Boolean)
+          .join(', ');
+
+        setAddress(formatted);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setAddressLoading(false);
+    }
+  })();
+}, [trip]);
 
   const handleDelete = () => {
     Alert.alert(
@@ -110,6 +149,9 @@ export default function TripDetailScreen() {
       ]
     );
   };
+  if (!trip) {
+  return null;
+}
 
   return (
     <>
@@ -145,69 +187,66 @@ export default function TripDetailScreen() {
 />
         ) : null}
 
-        <Text style={styles.title}>
-          {trip.title}
-        </Text>
+       <Text style={styles.title}>
+  {trip.title}
+</Text>
 
-        <View style={styles.row}>
-          <Ionicons
-            name="location-outline"
-            size={18}
-            color={
-              Colors.textSecondary
-            }
-          />
+<View style={styles.row}>
+  <Ionicons
+    name="location-outline"
+    size={18}
+    color={Colors.textSecondary}
+  />
 
-          <Text
-            style={styles.metaText}
-          >
-            {trip.destination}
-          </Text>
-        </View>
+  <View>
+    <Text style={styles.metaText}>
+      {trip.destination}
+    </Text>
 
-        <View style={styles.row}>
-          <Ionicons
-            name="calendar-outline"
-            size={18}
-            color={
-              Colors.textSecondary
-            }
-          />
+    {addressLoading ? (
+      <ActivityIndicator
+        size="small"
+        color={Colors.primary}
+      />
+    ) : address ? (
+      <Text style={styles.addressText}>
+        {address}
+      </Text>
+    ) : null}
+  </View>
+</View>
 
-          <Text
-            style={styles.metaText}
-          >
-            {trip.date}
-          </Text>
-        </View>
+<View style={styles.row}>
+  <Ionicons
+    name="calendar-outline"
+    size={18}
+    color={Colors.textSecondary}
+  />
 
-        <View
-          style={
-            styles.ratingContainer
-          }
-        >
-          <RatingStars
-            rating={trip.rating}
-          />
-        </View>
+  <Text style={styles.metaText}>
+    {trip.date}
+  </Text>
+</View>
 
-        {country ? (
-          <CountryCard
-            country={country}
-          />
-        ) : null}
+<View style={styles.ratingContainer}>
+  <RatingStars
+    rating={trip.rating}
+  />
+</View>
 
-        <Pressable
+{country ? (
+  <CountryCard
+    country={country}
+  />
+) : null}
+
+ <Pressable
   style={styles.button}
   onPress={() =>
     router.back()
   }
 >
-  <Text
-    style={
-      styles.buttonText
-    }
-  >
+  <Text style={styles.buttonText}>
     Back to list
   </Text>
 </Pressable>
@@ -220,12 +259,23 @@ export default function TripDetailScreen() {
     )
   }
 >
-  <Text
-    style={
-      styles.editButtonText
-    }
-  >
+  <Text style={styles.editButtonText}>
     Edit Trip
+  </Text>
+</Pressable>
+
+<Pressable
+  style={styles.deleteButton}
+  onPress={handleDelete}
+>
+  <Ionicons
+    name="trash-outline"
+    size={18}
+    color="white"
+  />
+
+  <Text style={styles.deleteButtonText}>
+    Delete Trip
   </Text>
 </Pressable>
 
@@ -342,4 +392,10 @@ editButtonText: {
       color: 'white',
       fontWeight: 'bold',
     },
+    addressText: {
+  marginTop: 4,
+  marginLeft: 24,
+  color: Colors.textSecondary,
+  fontSize: 12,
+},
   });

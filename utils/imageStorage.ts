@@ -1,14 +1,10 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
-// REVIEW: This module is currently not imported anywhere in the app.
-// Why it matters: selected images stay as temporary URIs and can break later.
-// How to fix: call `saveImageToTrip` after picking/capturing photo and store
-// returned persistent URI in trip data.
 export const ensureTripFolder = async (
   tripId: string
 ): Promise<string> => {
   const dir =
-    FileSystem.Paths.document.uri +
+    FileSystem.documentDirectory +
     `trips/${tripId}/`;
 
   const dirInfo =
