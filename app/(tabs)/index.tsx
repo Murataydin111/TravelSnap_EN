@@ -1,7 +1,6 @@
 import { Link } from 'expo-router';
 import { useCallback } from 'react';
 import {
-  ActivityIndicator,
   Pressable,
   SafeAreaView,
   StatusBar,
@@ -15,6 +14,7 @@ import AnimatedTripCard from '../../components/AnimatedTripCard';
 import EmptyState from '../../components/EmptyState';
 import FAB from '../../components/FAB';
 import ScreenHeader from '../../components/ScreenHeader';
+import SkeletonCard from '../../components/SkeletonCard';
 import TripCard from '../../components/TripCard';
 import TripStats from '../../components/TripStats';
 
@@ -39,15 +39,20 @@ export default function HomeScreen() {
   );
 
   if (loading) {
-    return (
-      <View style={styles.loader}>
-        <ActivityIndicator
-          size="large"
-          color={Colors.primary}
-        />
+  return (
+    <SafeAreaView
+      style={styles.safeArea}
+    >
+      <View
+        style={styles.contentContainer}
+      >
+        <SkeletonCard />
+        <SkeletonCard />
+        <SkeletonCard />
       </View>
-    );
-  }
+    </SafeAreaView>
+  );
+}
 
   return (
     <SafeAreaView style={styles.safeArea}>
