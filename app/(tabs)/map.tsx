@@ -83,24 +83,24 @@ export default function MapScreen() {
 
   return (
     <View style={styles.container}>
-      <MapView
-        ref={mapRef}
-        style={styles.map}
-        showsUserLocation
-        initialRegion={{
-          latitude:
-            location?.coords
-              ?.latitude ??
-            52.2297,
-          longitude:
-            location?.coords
-              ?.longitude ??
-            21.0122,
-          latitudeDelta: 0.1,
-          longitudeDelta: 0.1,
-        }}
-      >
-        {trips
+  <MapView
+    ref={mapRef}
+    style={styles.map}
+    showsUserLocation
+    initialRegion={{
+      latitude:
+        location?.coords
+          ?.latitude ??
+        52.2297,
+      longitude:
+        location?.coords
+          ?.longitude ??
+        21.0122,
+      latitudeDelta: 0.1,
+      longitudeDelta: 0.1,
+    }}
+  >
+            {trips
           .filter(
             (trip) =>
               trip.coordinates
@@ -119,6 +119,33 @@ export default function MapScreen() {
                     .longitude,
               }}
             >
+              <View
+                style={
+                  styles.customMarker
+                }
+              >
+                {trip.imageUri ? (
+                  <Image
+                    source={{
+                      uri: trip.imageUri,
+                    }}
+                    style={
+                      styles.markerImage
+                    }
+                  />
+                ) : (
+                  <View
+                    style={
+                      styles.markerPlaceholder
+                    }
+                  >
+                    <Text>
+                      📍
+                    </Text>
+                  </View>
+                )}
+              </View>
+
               <Callout>
                 <View
                   style={
@@ -224,4 +251,25 @@ const styles = StyleSheet.create({
     color:
       Colors.textSecondary,
   },
+  customMarker: {
+  width: 50,
+  height: 50,
+  borderRadius: 25,
+  overflow: 'hidden',
+  borderWidth: 2,
+  borderColor: 'white',
+  backgroundColor:
+    Colors.card,
+},
+
+markerImage: {
+  width: '100%',
+  height: '100%',
+},
+
+markerPlaceholder: {
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
 });
