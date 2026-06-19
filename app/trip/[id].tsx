@@ -1,4 +1,3 @@
-import { Image } from 'expo-image';
 import {
   ActivityIndicator,
   Alert,
@@ -8,6 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import {
   Stack,
@@ -23,6 +23,8 @@ import RatingStars from '../../components/RatingStars';
 import { useTrips } from '../../context/TripContext';
 
 import { useFetch } from '../../hooks/useFetch';
+
+
 
 import {
   RESTCOUNTRIES_BASE_URL,
@@ -172,17 +174,8 @@ useEffect(() => {
             color={Colors.primary}
           />
         ) : heroImage ? (
-          <Image
-  source={{
-    uri: heroImage,
-  }}
-  placeholder={{
-    blurhash:
-      'LGF5]+Yk^6#M@-5c,1J5@[or[Q6.'
-  }}
-  contentFit="cover"
-  cachePolicy="memory-disk"
-  transition={300}
+         <Animated.Image
+  source={{ uri: heroImage }}
   style={styles.heroImage}
 />
         ) : null}
@@ -261,21 +254,6 @@ useEffect(() => {
 >
   <Text style={styles.editButtonText}>
     Edit Trip
-  </Text>
-</Pressable>
-
-<Pressable
-  style={styles.deleteButton}
-  onPress={handleDelete}
->
-  <Ionicons
-    name="trash-outline"
-    size={18}
-    color="white"
-  />
-
-  <Text style={styles.deleteButtonText}>
-    Delete Trip
   </Text>
 </Pressable>
 

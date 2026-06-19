@@ -2,18 +2,19 @@ import React from 'react';
 import { Pressable } from 'react-native';
 
 import Animated, {
-    FadeInDown,
-    Layout,
-    runOnJS,
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-    withTiming,
+  FadeInDown,
+  FadeOutLeft,
+  LinearTransition,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 
 import {
-    Gesture,
-    GestureDetector,
+  Gesture,
+  GestureDetector,
 } from 'react-native-gesture-handler';
 
 interface AnimatedTripCardProps {
@@ -52,14 +53,12 @@ export default function AnimatedTripCard({
       }
     });
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: translateX.value },
-        { scale: scale.value },
-      ],
-    };
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: translateX.value },
+      { scale: scale.value },
+    ],
+  }));
 
   return (
     <GestureDetector gesture={panGesture}>
@@ -75,7 +74,8 @@ export default function AnimatedTripCard({
           entering={FadeInDown
             .delay(index * 80)
             .springify()}
-          layout={Layout.springify()}
+          exiting={FadeOutLeft.springify()}
+          layout={LinearTransition.springify()}
           style={animatedStyle}
         >
           {children}

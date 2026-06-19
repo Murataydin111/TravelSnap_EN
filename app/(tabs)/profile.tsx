@@ -4,8 +4,8 @@ import {
   View,
 } from 'react-native';
 
+import LikeButton from '../../components/LikeButton';
 import { Colors } from '../../constants/Colors';
-
 import { useTrips } from '../../context/TripContext';
 
 export default function ProfileScreen() {
@@ -76,6 +76,14 @@ export default function ProfileScreen() {
           </Text>
         </View>
       </View>
+
+      <View style={styles.likeContainer}>
+        <Text style={styles.favoriteText}>
+          Favorite App
+        </Text>
+
+        <LikeButton />
+      </View>
     </View>
   );
 }
@@ -83,89 +91,74 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
-    backgroundColor:
-      Colors.background,
-
+    backgroundColor: Colors.background,
     alignItems: 'center',
-
     paddingTop: 60,
-
     paddingHorizontal: 20,
   },
 
   avatar: {
     width: 100,
-
     height: 100,
-
     borderRadius: 50,
-
-    backgroundColor:
-      Colors.primary,
-
+    backgroundColor: Colors.primary,
     justifyContent: 'center',
-
     alignItems: 'center',
   },
 
   avatarText: {
     fontSize: 36,
-
     fontWeight: 'bold',
-
     color: Colors.background,
   },
 
   name: {
     color: Colors.textPrimary,
-
     fontSize: 24,
-
     fontWeight: 'bold',
-
     marginTop: 20,
   },
 
   joined: {
     color: Colors.textSecondary,
-
     marginTop: 8,
-
     fontSize: 16,
   },
 
   statsRow: {
     flexDirection: 'row',
-
     marginTop: 40,
-
     gap: 12,
   },
 
   card: {
     flex: 1,
-
     backgroundColor: Colors.card,
-
     padding: 16,
-
     borderRadius: 16,
-
     alignItems: 'center',
   },
 
   value: {
     color: Colors.primary,
-
     fontSize: 24,
-
     fontWeight: 'bold',
   },
 
   label: {
     color: Colors.textSecondary,
-
     marginTop: 6,
+  },
+
+  likeContainer: {
+    marginTop: 40,
+    alignItems: 'center',
+  },
+
+  favoriteText: {
+    color: Colors.textPrimary,
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 12,
   },
 });

@@ -7,7 +7,9 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import Animated from 'react-native-reanimated';
+import Animated, {
+  LinearTransition,
+} from 'react-native-reanimated';
 
 import AddTripForm from '../../components/AddTripForm';
 import AnimatedTripCard from '../../components/AnimatedTripCard';
@@ -59,6 +61,7 @@ export default function HomeScreen() {
       <StatusBar barStyle="light-content" />
 
       <Animated.FlatList
+      itemLayoutAnimation={LinearTransition.springify()}
         data={trips}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.contentContainer}
