@@ -2,12 +2,17 @@ import {
   ActivityIndicator,
   Alert,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
-  View,
+  View
 } from 'react-native';
-import Animated from 'react-native-reanimated';
+import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedRef,
+  useAnimatedStyle,
+  useScrollViewOffset,
+} from 'react-native-reanimated';
 
 import {
   Stack,
@@ -85,6 +90,25 @@ export default function TripDetailScreen() {
   photoData?.results?.[0]?.urls
     ?.regular ||
   trip?.imageUri;
+  const scrollRef =
+  useAnimatedRef<Animated.ScrollView>();
+
+const scrollY =
+  useScrollViewOffset(scrollRef);
+
+const headerAnimatedStyle =
+  useAnimatedStyle(() => {
+    const scale = interpolate(
+      scrollY.value,
+      [-200, 0],
+      [1.3, 1],
+      Extrapolation.CLAMP
+    );
+
+    return {
+      transform: [{ scale }],
+    };
+  });
 
 const country =
   countryData?.[0];
@@ -165,7 +189,8 @@ useEffect(() => {
         }}
       />
 
-      <ScrollView
+      <Animated.ScrollView
+  ref={scrollRef}
         style={styles.container}
       >
         {photoLoading ? (
@@ -176,7 +201,10 @@ useEffect(() => {
         ) : heroImage ? (
          <Animated.Image
   source={{ uri: heroImage }}
-  style={styles.heroImage}
+  style={[
+    styles.heroImage,
+    headerAnimatedStyle,
+  ]}
 />
         ) : null}
 
@@ -277,7 +305,7 @@ useEffect(() => {
             Delete Trip
           </Text>
         </Pressable>
-      </ScrollView>
+      </Animated.ScrollView>
     </>
   );
 }
